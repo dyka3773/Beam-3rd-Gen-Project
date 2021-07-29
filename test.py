@@ -27,7 +27,7 @@ import random
 
 # print(x)
 
-    def myMain():
+def myMain():
     D = random.randint(10,20)
     d = random.randint(0,5)
     print(D,"\t",d)
