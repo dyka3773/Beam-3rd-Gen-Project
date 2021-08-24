@@ -1,4 +1,2 @@
 # Beam 3rd Gen Project
- 
- 
- **Hello World!**
+ BEAM 3rd Gen is a team formed in Thessaloniki from undergraduate students passionate about space missions. Our team was created in August 2020. We aim to participate in a number of educational space-related programs, the main being the REXUS-BEXUS competition. Our project for the REXUS competition, named (experiment's name) deals with the behavior of emulsions in microgravity.
