@@ -1,7 +1,5 @@
 import pandas as pd
 
-import sys
-
 name_list = [
     "time",
     "Thermal_Sensor_1",
