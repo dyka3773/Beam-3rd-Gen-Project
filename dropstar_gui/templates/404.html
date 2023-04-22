@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found</title>
-</head>
-<body>
-    <!-- TODO: Create a 404 page -->
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card border-danger" style="position: top 100px bottom -100px; top: 100px; background-color: #FBBEB8;">
+    <div class="card-body text-center">
+        <h1 class="card-title">404 Error: Page Not Found</h1>
+        <p class="card-text">The requested URL {{ request.url }} was not found on this server.</p>
+    </div>
+</div>
+{% endblock %}
