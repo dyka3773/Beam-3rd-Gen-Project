@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+        <div id="plot" class="bg-black">
+            <img src="{{ url_for('static', filename='img/plot.png') }}" style="height: 300px; width: 450px">
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                $("#plot").click(function() {
+                    $.get("../figures/1", function(data) {
+                        $("#plot").html(data);
+                        console.log(data);
+                    });
+                });
+            });
+        </script>
+    <!-- <div style="float: left;width: 35%">
+        <img src="{{ url_for('static', filename='img/plot1.png') }}" style="height: 300px; width: 450px">
+    </div> -->
+</div>
+{% endblock %}

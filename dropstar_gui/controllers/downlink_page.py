@@ -12,4 +12,4 @@ info = { # FIXME: This info needs to be updated
 }
 
 def render():
-    return render_template('base.html', info=info) # TODO: Create a downlink page
+    return render_template('downlink.html', info=info, title="Downlink") # TODO: Complete the Downlink page
