@@ -40,21 +40,3 @@ ul {
     border-radius: 3px;
     margin-bottom: 20px;
 }
-
-dd {
-    width: 70%;
-    float: left;
-}
-
-dt {
-    width: 30%;
-    float: left;
-    text-align: right;
-}
-
-hr {
-    border: 0;
-    height: 4px;
-    background: black;
-    background-image: linear-gradient(to right, #ccc, black, #ccc);
-}
