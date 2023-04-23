@@ -12,4 +12,4 @@ info = { # FIXME: This info needs to be updated
 }
 
 def render():
-    return render_template('base.html', info=info) # TODO: Create an uplink page
+    return render_template('base.j2', info=info) # TODO: Create an uplink page

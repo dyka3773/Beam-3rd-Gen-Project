@@ -12,7 +12,7 @@ function setMotorStatus(motor, speed){
     else if (speed > 0){
         $(motor).html(`Speed Up \t\t (${speed})`)
         $(motor).removeClass()
-        // $(motor).addClass("text-primary")
+        // $(motor).addClass("text-primary") // This is the default color which is blue
     }
     else {
         $(motor).html(`Error  \t\t (${speed})`)

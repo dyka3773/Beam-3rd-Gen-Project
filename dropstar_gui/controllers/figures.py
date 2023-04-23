@@ -5,8 +5,10 @@ import matplotlib
 from matplotlib import pyplot as plt
 
 from .utils import base64_util
+from .status import *
 
 matplotlib.use('agg')
+
 
 FIGURES = ["temperature", "pressure"]
 
@@ -17,11 +19,13 @@ def get_temp_plot(img: io.BytesIO) -> None:
         img (io.BytesIO): A buffer to store the plot as an image.
     """
     fake_time = 60
-    y = [np.random.randint(-50,100) for _ in range(fake_time)]
     x = [i for i in range(fake_time)]
+    sensor1 = get_temperature("sensor1", fake_time)
+    sensor2 = get_temperature("sensor2", fake_time)
     
     figure, ax = plt.subplots()
-    ax.plot(x,y)
+    ax.plot(x,sensor1)
+    ax.plot(x,sensor2)
     ax.set_title("Temperature Plot")
     ax.set_xlabel("Time")
     ax.set_ylabel("Temperature (C)")
@@ -36,8 +40,8 @@ def get_pressure_plot(img: io.BytesIO) -> None:
         img (io.BytesIO): A buffer to store the plot as an image.
     """
     fake_time = 60
-    y = [np.random.randint(8,32)/16 for _ in range(fake_time)]
     x = [i for i in range(fake_time)]
+    y = get_pressure("sensor1", fake_time)
     
     figure, ax = plt.subplots()
     ax.plot(x,y)

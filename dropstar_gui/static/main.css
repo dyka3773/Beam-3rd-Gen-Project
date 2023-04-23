@@ -40,3 +40,8 @@ ul {
     border-radius: 3px;
     margin-bottom: 20px;
 }
+
+div.status-check div p {
+    /* This is used in the test plan cards */
+    font-size: 23px;
+}

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for
 
 from controllers import home_page, downlink_page, uplink_page, figures as figs, status as experiment_status
+from controllers.tests import with_fluid, without_fluid
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -17,7 +18,14 @@ def downlink():
 def uplink():
     return uplink_page.render()
 
-# TODO: Add pages for the test plans
+@app.route('/test-with-fluid/')
+def test_with_fluid():
+    return with_fluid.render_page()
+
+@app.route('/test-without-fluid/')
+def test_without_fluid():
+    return without_fluid.render_page()
+
 
 # The following routes are for special purposes and do not serve any pages
 
@@ -30,11 +38,11 @@ def figures(figure_name: str):
 
     Returns:
         Returns a tuple containing the image and the HTTP status code.
-    """    
-    # return figs.render(figure_name, code) # FIXME: This should be the way to do it
+    """
     if figure_name in figs.FIGURES:
         return figs.get_plot_by_type(figure_name)
     else:
+        app.logger.error(f"Figure not found. The requested figure name was: {figure_name}")
         return "Figure not found", 400
     
 @app.get('/status/')
@@ -52,6 +60,36 @@ def status():
     }
     return status, 200
 
+@app.post('/status/check/<component>')
+def check(component: str):
+    """Checks the status of a component.
+
+    Args:
+        component (str): The component to be checked.
+
+    Returns:
+        Returns a tuple containing the status and the HTTP status code.
+    """
+    if component=='motor':
+        status = experiment_status.check_motor()
+    elif component=='sound_card':
+        status = experiment_status.check_sound_card()
+    elif component=='camera':
+        status = experiment_status.check_camera()
+    elif component=='heater':
+        status = experiment_status.check_heater()
+    else:
+        return "Component not found", 400
+    
+    app.logger.info(f"Component {component} status: {status}")
+    
+    # status = True # FIXME: This is just for testing purposes
+    
+    if status==True:
+        return "OK", 200
+    else:
+        return "Error", 417
+
 # The following routes are for error handling
 
 @app.errorhandler(404)
@@ -65,7 +103,7 @@ def page_not_found(error):
         Returns a tuple containing the rendered 404 page and the HTTP status code.
     """
     app.logger.error(f"Page not found. The requested URL was: {request.url}")
-    return render_template('404.html'), 404
+    return render_template('404.j2'), 404
 
 if __name__ == '__main__':
     app.run(
