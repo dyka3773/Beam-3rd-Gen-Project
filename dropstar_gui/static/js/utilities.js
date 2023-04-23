@@ -56,3 +56,21 @@ function setCameraStatus(camera, status){
         $(camera).css("color", "white")
     }
 }
+
+function setHeaterStatus(heater, status){
+    if (status == false){
+        $(heater).html("OFF")
+        $(heater).removeClass()
+        $(heater).addClass("text-danger")
+    }
+    else if (status == true){
+        $(heater).html("ON")
+        $(heater).removeClass()
+        $(heater).addClass("text-success")
+    }
+    else {
+        $(heater).html(`Error  \t\t (${status})`)
+        $(heater).css("bg-color", "black")
+        $(heater).css("color", "white")
+    }
+}

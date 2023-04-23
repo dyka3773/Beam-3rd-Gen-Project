@@ -16,7 +16,7 @@ def get_temp_plot(img: io.BytesIO) -> None:
     Args:
         img (io.BytesIO): A buffer to store the plot as an image.
     """
-    fake_time = 100
+    fake_time = 60
     y = [np.random.randint(-50,100) for _ in range(fake_time)]
     x = [i for i in range(fake_time)]
     
@@ -35,7 +35,7 @@ def get_pressure_plot(img: io.BytesIO) -> None:
     Args:
         img (io.BytesIO): A buffer to store the plot as an image.
     """
-    fake_time = 100
+    fake_time = 60
     y = [np.random.randint(8,32)/16 for _ in range(fake_time)]
     x = [i for i in range(fake_time)]
     

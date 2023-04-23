@@ -16,6 +16,9 @@
                 <div id="camera" class="p-2">
                     <p><strong>Camera: </strong><span id="cameraStatus">-</span></p>
                 </div>
+                <div id="heater" class="p-2">
+                    <p><strong>Heater: </strong><span id="heaterStatus">-</span></p>
+                </div>
             </div>
         </div>
     </div>
@@ -43,6 +46,7 @@
                         setMotorStatus("#motorStatus", data.motor_speed);
                         setSoundCardStatus("#soundCardStatus", data.sound_card_status);
                         setCameraStatus("#cameraStatus", data.camera_status);
+                        setHeaterStatus("#heaterStatus", data.heater_status);
                     });
                 }, 333);
             } else {

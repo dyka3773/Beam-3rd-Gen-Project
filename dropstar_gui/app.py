@@ -47,7 +47,8 @@ def status():
     status = {
         'motor_speed': experiment_status.get_motor_speed(),
         'sound_card_status': experiment_status.get_sound_card_status(),
-        'camera_status': experiment_status.get_camera_status()
+        'camera_status': experiment_status.get_camera_status(),
+        'heater_status': experiment_status.get_heater_status(),
     }
     return status, 200
 

@@ -23,3 +23,11 @@ def get_camera_status() -> bool:
         bool: The camera status.
     """
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+
+def get_heater_status() -> bool:
+    """Gets the heater status from the database.
+
+    Returns:
+        bool: The heater status.
+    """
+    return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
