@@ -19,6 +19,10 @@ def get_plot(img: io.BytesIO) -> None:
     
     figure, ax = plt.subplots()
     ax.plot(x,y)
+    ax.set_title("Test Figure")
+    ax.set_xlabel("Eirini")
+    ax.set_ylabel("Iraklis")
+    ax.grid()
     figure.savefig(img, format='png')
     plt.close(figure)
 
@@ -35,4 +39,4 @@ def render_plot() -> str:
     
     encoded_image = base64_util.encode_image(img.getvalue())
     
-    return f'<img src:"data:image/png;base64,{encoded_image}">'
+    return f"{encoded_image}"

@@ -1,22 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row">
-        <div id="plot" class="bg-black">
-            <img src="{{ url_for('static', filename='img/plot.png') }}" style="height: 300px; width: 450px">
-        </div>
+    <div class="d-flex justify-content-center">
+        <figure id="plot1" class="figure"></figure>
+        <figure  id="plot2" class="figure"></figure>
+    </div>
+    <div class="d-flex justify-content-center">
+        <button id="refreshButton">Auto-refresh plots</button>
+    </div>
 
-        <script>
-            $(document).ready(function() {
-                $("#plot").click(function() {
-                    $.get("../figures/1", function(data) {
-                        $("#plot").html(data);
-                        console.log(data);
-                    });
+    <script>
+        $(document).ready(function() {
+            var clicked = false;
+            var interval;
+            $("#refreshButton").click(function() {
+                if (clicked === false) {
+                    clicked = true;
+                    $("#refreshButton").html("Stop auto-refresh");
+                    interval = setInterval(function() {
+                        $.get("../figures/1", function(data) {
+                            $("#plot1").html(`<img src="data:image/png;base64,${data}" class="figure-img img-fluid rounded" style="height: 300px; width: 450px">`);
+                        });
+                        $.get("../figures/2", function(data) {
+                            $("#plot2").html(`<img src="data:image/png;base64,${data}" class="figure-img img-fluid rounded" style="height: 300px; width: 450px">`);
+                        });
+                    }, 333);
+                } else {
+                    clicked = false;
+                    $("#refreshButton").html("Auto-refresh plots");
+                    clearInterval(interval);
+                }
+
+                $.get("../figures/1", function(data) {
+                    $("#plot1").html(`<img src="data:image/png;base64,${data}" class="figure-img img-fluid rounded" style="height: 300px; width: 450px">`);
+                });
+                $.get("../figures/2", function(data) {
+                    $("#plot2").html(`<img src="data:image/png;base64,${data}" class="figure-img img-fluid rounded" style="height: 300px; width: 450px">`);
                 });
             });
-        </script>
-    <!-- <div style="float: left;width: 35%">
-        <img src="{{ url_for('static', filename='img/plot1.png') }}" style="height: 300px; width: 450px">
-    </div> -->
+        });
+    </script>
 </div>
 {% endblock %}

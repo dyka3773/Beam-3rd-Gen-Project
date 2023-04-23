@@ -34,6 +34,8 @@ def figures(figure_name: str, code: int = None):
     app.logger.info(f"Figure name: {figure_name}")
     if code:
         app.logger.info(f"Code: {code}")
+    
+    # return test_figure.render(figure_name, code) # FIXME: This should be the way to do it
     return test_figure.render_plot()
 
 @app.errorhandler(404)
