@@ -60,6 +60,16 @@ def status():
     }
     return status, 200
 
+@app.get('/delete_data/')
+def delete_data():
+    """Deletes the data from the CSV file on the rocket
+
+    Returns:
+        Returns a tuple containing the status and the HTTP status code.
+    """
+    bool = experiment_status.delete_data()
+    return ('OK', 200) if bool else ('Error', 417)
+
 @app.post('/status/check/<component>')
 def check(component: str):
     """Checks the status of a component.

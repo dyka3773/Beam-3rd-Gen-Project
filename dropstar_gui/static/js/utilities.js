@@ -74,3 +74,15 @@ function setHeaterStatus(heater, status){
         $(heater).css("color", "white")
     }
 }
+
+/**
+ * Displays a toast message on the screen
+ * @param {string} id The id or class of the toast to be shown
+ */
+function showToast(id){
+    var toastElList = [].slice.call(document.querySelectorAll(id))
+    var toastList = toastElList.map(function(toastEl) {
+        return new bootstrap.Toast(toastEl)
+    })
+    toastList.forEach(toast => toast.show()) 
+}

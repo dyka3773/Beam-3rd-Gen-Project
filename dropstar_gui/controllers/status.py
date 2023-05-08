@@ -103,3 +103,11 @@ def check_heater() -> bool:
         bool: The heater status.
     """
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+
+def delete_data() -> bool:
+    """Deletes the data from the CSV file.
+    
+    Returns:
+        bool: The status of the operation.
+    """
+    return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file

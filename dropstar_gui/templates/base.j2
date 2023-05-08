@@ -51,6 +51,7 @@
                         </li>
                     </ul>
                 </div>
+                <button type="button" id="deleteBtn" class="btn btn-outline-info">Delete Data on Rocket</button>
             </div>
         </nav>
     </header>
@@ -74,5 +75,38 @@
         {% endif %}
 
     </main>
+
+    <div class="toast-container">
+        <div id="successToast" class="toast d-flex align-items-center text-white bg-success border-0 fade" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body ">
+                Data on the rocket has been deleted!
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0 fade" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body ">
+                Something went wrong!
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    
+    <script>
+
+        $(document).ready(function() {
+            $("#deleteBtn").click(function() {
+                $.ajax({
+                    url: "{{ url_for('delete_data') }}",
+                    type: "GET",
+                    success: function(response) {
+                        showToast("#successToast");
+                    },
+                    error: function(xhr) {
+                        showToast("#errorToast");
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -10,4 +10,5 @@
 - [ ] We should download the libraries that are called through CDNs (Bootstrap/jQuery)
 - [X] Create pages for the Test plans 
 - [ ] Create page for the Uplink
+- [X] Add a button that deletes the data on the rocket-side
 - [ ] Generate the CSV file with fake data but in real time with the proper format

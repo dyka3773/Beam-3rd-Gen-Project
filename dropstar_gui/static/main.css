@@ -45,3 +45,12 @@ div.status-check div p {
     /* This is used in the test plan cards */
     font-size: 23px;
 }
+
+.toast-container {
+    /* This places the toast container on the bottom right of the screen and allows it to have multiple toasts stacked on each other */
+    position: fixed;
+    bottom: 1rem;
+    right: 1.5rem;
+    display: grid;
+    justify-items: end;
+}
