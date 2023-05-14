@@ -7,7 +7,7 @@
 - [X] Find a way to call the `figures` endpoint from the GUI to replace images
 - [X] Complete the Downlink page
 - [ ] Update info box with the latest information
-- [ ] We should download the libraries that are called through CDNs (Bootstrap/jQuery)
+- [X] We should download the libraries that are called through CDNs (Bootstrap/jQuery)
 - [X] Create pages for the Test plans 
 - [ ] Create page for the Uplink
 - [X] Add a button that deletes the data on the rocket-side
