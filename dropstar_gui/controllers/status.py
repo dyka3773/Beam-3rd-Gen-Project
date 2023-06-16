@@ -37,7 +37,7 @@ def get_heater_status() -> bool:
     """
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
-def get_temperature(sensor: str, time: int) -> float:
+def get_temperature(sensor: str, time: int) -> list:
     """Gets the temperature from the CSV file.
 
     Args:
@@ -45,14 +45,14 @@ def get_temperature(sensor: str, time: int) -> float:
         time (int): The time for which the temperature will be read.
 
     Returns:
-        float: The temperature.
+        list: The temperature values for the given time.
     """
     
     temperature = [np.random.randint(-50,100) for _ in range(time)]
     
     return temperature # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
-def get_pressure(sensor: str, time: int) -> float:
+def get_pressure(sensor: str, time: int) -> list:
     """Gets the pressure from the CSV file.
 
     Args:
@@ -60,7 +60,7 @@ def get_pressure(sensor: str, time: int) -> float:
         time (int): The time for which the pressure will be read.
 
     Returns:
-        float: The pressure.
+        list: The pressure values for the given time.
     """
     
     pressure = [np.random.randint(8,32)/16 for _ in range(time)]

@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, url_for
+from flask_wtf.csrf import CSRFProtect
 
 from controllers import home_page, downlink_page, uplink_page, figures as figs, status as experiment_status
 from controllers.tests import with_fluid, without_fluid
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 @app.route('/')
 def index():
@@ -67,8 +70,8 @@ def delete_data():
     Returns:
         Returns a tuple containing the status and the HTTP status code.
     """
-    bool = experiment_status.delete_data()
-    return ('OK', 200) if bool else ('Error', 417)
+    data_were_deleted = experiment_status.delete_data()
+    return ('OK', 200) if data_were_deleted else ('Error', 417)
 
 @app.post('/status/check/<component>')
 def check(component: str):

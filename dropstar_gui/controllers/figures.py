@@ -5,7 +5,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 
 from .utils import base64_util
-from .status import *
+from .status import get_temperature, get_pressure
 
 matplotlib.use('agg')
 
