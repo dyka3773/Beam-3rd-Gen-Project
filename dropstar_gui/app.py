@@ -132,5 +132,5 @@ def favicon():
 if __name__ == '__main__':
     app.run(
         host="0.0.0.0", # This will make the app available to other computers on the network
-        port="8000"
+        port=8000
     )

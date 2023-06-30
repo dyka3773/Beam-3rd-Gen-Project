@@ -1,44 +1,58 @@
 import numpy as np
+import sqlite3 as sql
+import logging
+import time
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # The following functions are used to get the status of each component of the system
 
-# FIXME: The following functions are just placeholders. They should be replaced with the actual functions which will read the values from the csv file
-
 def get_motor_speed() -> int:
-    """Gets the motor speed from the CSV file.
+    """Gets the motor speed from the db.
 
     Returns:
         int: The motor speed.
     """
-    return np.random.randint(0,255) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+    with sql.connect('GS_data.db') as db:
+        speed = db.execute('SELECT motor_speed FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+        
+    return speed
 
 def get_sound_card_status() -> bool:
-    """Gets the sound card status from the CSV file.
+    """Gets the sound card status from the db.
 
     Returns:
         bool: The sound card status.
     """
-    return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+    with sql.connect('GS_data.db') as db:
+        status = db.execute('SELECT sound_card_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+    
+    return status
 
 def get_camera_status() -> bool:
-    """Gets the camera status from the CSV file.
+    """Gets the camera status from the db.
 
     Returns:
         bool: The camera status.
     """
-    return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+    with sql.connect('GS_data.db') as db:
+        status = db.execute('SELECT camera_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+    
+    return status
 
 def get_heater_status() -> bool:
-    """Gets the heater status from the CSV file.
+    """Gets the heater status from the db.
 
     Returns:
         bool: The heater status.
     """
-    return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+    with sql.connect('GS_data.db') as db:
+        status = db.execute('SELECT heater_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+    
+    return status
 
 def get_temperature(sensor: str, time: int) -> list:
-    """Gets the temperature from the CSV file.
+    """Gets the temperature from the db.
 
     Args:
         sensor (str): The sensor from which the temperature will be read.
@@ -47,13 +61,27 @@ def get_temperature(sensor: str, time: int) -> list:
     Returns:
         list: The temperature values for the given time.
     """
+    with sql.connect('GS_data.db') as db:
+        if sensor == 'sensor1':
+            col = 'temp_1'
+        elif sensor == 'sensor2':
+            col = 'temp_2'
+        else:
+            raise ValueError('Invalid sensor name')
+        
+        temperature = db.execute(f'''SELECT {col} 
+                                        FROM GS_data
+                                        WHERE time >= DATETIME('now', '-{time} seconds')
+                                        ORDER BY time DESC
+                                ''').fetchall()
     
-    temperature = [np.random.randint(-50,100) for _ in range(time)]
+    temperature.reverse()
+    logging.debug(f'Got temperature: {temperature}')
     
-    return temperature # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+    return temperature
 
 def get_pressure(sensor: str, time: int) -> list:
-    """Gets the pressure from the CSV file.
+    """Gets the pressure from the db.
 
     Args:
         sensor (str): The sensor from which the pressure will be read.
@@ -62,15 +90,28 @@ def get_pressure(sensor: str, time: int) -> list:
     Returns:
         list: The pressure values for the given time.
     """
+    with sql.connect('GS_data.db') as db:
+        if sensor == 'sensor1':
+            col = 'pressure_1'
+        elif sensor == 'sensor2':
+            col = 'pressure_2'
+        else:
+            raise ValueError('Invalid sensor name')
+        
+        pressure = db.execute(f'''SELECT {col} 
+                                    FROM GS_data
+                                    WHERE time >= DATETIME('now', '-{time} seconds')
+                                    ORDER BY time DESC
+                                ''').fetchall()
     
-    pressure = [np.random.randint(8,32)/16 for _ in range(time)]
+    pressure.reverse()
+    logging.debug(f'Got pressure: {pressure}')
     
-    return pressure # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
+    return pressure
 
-
-# TODO: Add the functions to send commands to the components.
 
 # The following functions are used to check the status of each component of the system. This means that they will check if the component is working properly.
+# FIXME: The following functions are just placeholders. In order to implement these, we need to implement the Uplink first.
 
 def check_motor() -> bool:
     """Checks the motor status.
@@ -86,6 +127,7 @@ def check_sound_card() -> bool:
     Returns:
         bool: The sound card status.
     """
+    time.sleep(1)
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def check_camera() -> bool:
@@ -94,6 +136,7 @@ def check_camera() -> bool:
     Returns:
         bool: The camera status.
     """
+    time.sleep(2)
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def check_heater() -> bool:
@@ -102,10 +145,11 @@ def check_heater() -> bool:
     Returns:
         bool: The heater status.
     """
+    time.sleep(3)
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def delete_data() -> bool:
-    """Deletes the data from the CSV file.
+    """Deletes the data from the db.
     
     Returns:
         bool: The status of the operation.
