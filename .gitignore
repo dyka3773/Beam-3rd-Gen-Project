@@ -116,3 +116,6 @@ dmypy.json
 # Sonarqube analysis
 .sonarqube/
 .scannerwork/
+
+# Visual Studio Code
+.vscode/
