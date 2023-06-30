@@ -6,8 +6,8 @@ from controllers.tests import with_fluid, without_fluid
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-csrf = CSRFProtect()
-csrf.init_app(app)
+# csrf = CSRFProtect() # TODO: This is for CSRF protection. I don't know how to use it yet, if we uncomment this line, the plots won't reload.
+# csrf.init_app(app)
 
 @app.route('/')
 def index():
@@ -117,6 +117,17 @@ def page_not_found(error):
     """
     app.logger.error(f"Page not found. The requested URL was: {request.url}")
     return render_template('404.j2'), 404
+
+# The folloring route is for favicon
+
+@app.route('/favicon.ico')
+def favicon():
+    """Sends the favicon to the client.
+
+    Returns:
+        Returns the favicon image.
+    """
+    return app.send_static_file('img/favicon.png')
 
 if __name__ == '__main__':
     app.run(

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-# The folloring functions are used to get the status of each component of the system
+# The following functions are used to get the status of each component of the system
 
 # FIXME: The following functions are just placeholders. They should be replaced with the actual functions which will read the values from the csv file
 
