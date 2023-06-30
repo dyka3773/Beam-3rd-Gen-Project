@@ -1,0 +1,10 @@
+{% extends "base.j2" %}
+
+{% block content %}
+<div class="card border-danger" style="position: top 100px bottom -100px; top: 100px; background-color: #FBBEB8;">
+    <div class="card-body text-center">
+        <h1 class="card-title">404 Error: Page Not Found</h1>
+        <p class="card-text">The requested URL {{ request.url }} was not found on this server.</p>
+    </div>
+</div>
+{% endblock %}

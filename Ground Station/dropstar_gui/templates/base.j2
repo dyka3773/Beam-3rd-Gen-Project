@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-5.2.3-dist/css/bootstrap.min.css') }}">
+    
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='jQuery/jquery-3.7.0.min.js') }}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <script src="{{ url_for('static', filename='js/utilities.js') }}"></script>
+
+    {% if title %}
+        <title>DROPSTAR - {{ title }}</title>
+    {% else %}
+        <title>DROPSTAR</title>
+    {% endif %}
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-black-dropstar fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand mr-4" href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/favicon.png') }}" style="width:60px;height:60px;">
+                    <span> DROPSTAR</span>
+                </a>
+                <!-- BUG: This doesn't work on mobiles by default -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarWithDropdown" aria-controls="navbarWithDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse show" id="navbarWithDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('downlink') }}">Downlink</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('test_with_fluid') }}">Test With Fluid</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('test_without_fluid') }}">Test Without Fluid</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Dev Tools
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" href="{{ url_for('uplink') }}">Uplink</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" id="deleteBtn" class="btn btn-outline-info">Delete Data on Rocket</button>
+            </div>
+        </nav>
+    </header>
+    <main role="main" class="container">
+        {% if title %}
+            <h1 style="margin-top:100px;">{{ title }}</h1>
+        {% endif %}
+        <div class="row">
+            <div>
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+
+        {% if info %}
+        <div class="row">
+            <div class="content-section" style="margin-top: 30px;">
+                {% include "info.j2" %}
+            </div>
+        </div>
+        {% endif %}
+
+    </main>
+
+    <div class="toast-container">
+        <div id="successToast" class="toast d-flex align-items-center text-white bg-success border-0 fade" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body ">
+                Data on the rocket has been deleted!
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0 fade" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body ">
+                Something went wrong!
+            </div>
+            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    
+    <script>
+
+        $(document).ready(function() {
+            $("#deleteBtn").click(function() {
+                $.ajax({
+                    url: "{{ url_for('delete_data') }}",
+                    type: "GET",
+                    success: function(response) {
+                        showToast("#successToast");
+                    },
+                    error: function(xhr) {
+                        showToast("#errorToast");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

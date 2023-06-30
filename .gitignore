@@ -94,7 +94,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-django_env/
 
 # Spyder project settings
 .spyderproject
@@ -113,3 +112,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Sonarqube analysis
+.sonarqube/
+.scannerwork/
+
+# Visual Studio Code
+.vscode/
+
+# SQLite database files
+*.sqlite3
+*.db

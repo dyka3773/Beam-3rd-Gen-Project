@@ -1,0 +1,17 @@
+{% block infocard %}
+<h2>{{ info.team_name }}</h2>
+<p>{{ info.project_desc }}</p>
+{% if info.team_members %}
+    <strong>Team members : </strong>
+    <ul class="list-group">
+        {% for member in info.team_members %}
+            <li class="list-group-item list-group-item-light">{{ member }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<span><u>Current Stage :</u> {{ info.current_stage }}</span>
+<br>
+<!-- TODO: Fix what is going to be presented in the Info section -->
+<br>
+<span>{{ info.date }}</span>
+{% endblock %}
