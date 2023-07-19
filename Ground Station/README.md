@@ -5,5 +5,5 @@
 
 - [ ] Update info box with the latest information
 - [ ] Create page for the Uplink
-- [ ] Generate the CSV file with fake data but in real time with the proper format
-- [X] Update the documentation
+- [ ] During testing again the downlink data, there is an issue with multiple requests and the db locking the file
+- [X] Generate the CSV file with fake data but in real time with the proper format

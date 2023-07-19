@@ -48,7 +48,7 @@
                         setCameraStatus("#cameraStatus", data.camera_status);
                         setHeaterStatus("#heaterStatus", data.heater_status);
                     });
-                }, 333);
+                }, 2500); // once every 5 seconds
             } else {
                 clicked = false;
                 $("#refreshButton").html("Start auto-refresh");
