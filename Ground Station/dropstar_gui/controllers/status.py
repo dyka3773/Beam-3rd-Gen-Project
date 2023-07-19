@@ -13,9 +13,9 @@ def get_motor_speed() -> int:
     Returns:
         int: The motor speed.
     """
-    with sql.connect('GS_data.db') as db:
+    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         speed = db.execute('SELECT motor_speed FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
-        
+
     return speed
 
 def get_sound_card_status() -> bool:
@@ -24,7 +24,7 @@ def get_sound_card_status() -> bool:
     Returns:
         bool: The sound card status.
     """
-    with sql.connect('GS_data.db') as db:
+    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         status = db.execute('SELECT sound_card_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
     
     return status
@@ -35,7 +35,7 @@ def get_camera_status() -> bool:
     Returns:
         bool: The camera status.
     """
-    with sql.connect('GS_data.db') as db:
+    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         status = db.execute('SELECT camera_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
     
     return status
@@ -46,7 +46,7 @@ def get_heater_status() -> bool:
     Returns:
         bool: The heater status.
     """
-    with sql.connect('GS_data.db') as db:
+    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         status = db.execute('SELECT heater_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
     
     return status
@@ -61,7 +61,7 @@ def get_temperature(sensor: str, time: int) -> list:
     Returns:
         list: The temperature values for the given time.
     """
-    with sql.connect('GS_data.db') as db:
+    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         if sensor == 'sensor1':
             col = 'temp_1'
         elif sensor == 'sensor2':
@@ -90,7 +90,7 @@ def get_pressure(sensor: str, time: int) -> list:
     Returns:
         list: The pressure values for the given time.
     """
-    with sql.connect('GS_data.db') as db:
+    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         if sensor == 'sensor1':
             col = 'pressure_1'
         elif sensor == 'sensor2':
@@ -127,7 +127,7 @@ def check_sound_card() -> bool:
     Returns:
         bool: The sound card status.
     """
-    time.sleep(1) # FIXME: These sleep calls are here for testing purposes. They should be removed when the Uplink is implemented.
+    time.sleep(1) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def check_camera() -> bool:
@@ -136,7 +136,7 @@ def check_camera() -> bool:
     Returns:
         bool: The camera status.
     """
-    time.sleep(2) # FIXME: These sleep calls are here for testing purposes. They should be removed when the Uplink is implemented.
+    time.sleep(2) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def check_heater() -> bool:
@@ -145,7 +145,7 @@ def check_heater() -> bool:
     Returns:
         bool: The heater status.
     """
-    time.sleep(3) # FIXME: These sleep calls are here for testing purposes. They should be removed when the Uplink is implemented.
+    time.sleep(3) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def delete_data() -> bool:

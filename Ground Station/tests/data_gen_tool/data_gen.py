@@ -30,7 +30,7 @@ def generate_db():
 
     interval = 1/3 # 3Hz
         
-    with sql.connect('GS_data.db') as db:
+    with sql.connect('GS_data.db', timeout=10) as db:
         cursor = db.cursor()
         cursor.executescript('''
             DROP TABLE IF EXISTS GS_data;
