@@ -1,6 +1,7 @@
 import io
 import numpy as np
 import matplotlib
+import asyncio
 
 from matplotlib import pyplot as plt
 
@@ -12,7 +13,7 @@ matplotlib.use('agg')
 
 FIGURES = ["temperature", "pressure"]
 
-def get_temp_plot(img: io.BytesIO) -> None:
+async def get_temp_plot(img: io.BytesIO) -> None:
     """Creates a matplotlib plot and stores it in the given io buffer.
 
     Args:
@@ -20,8 +21,10 @@ def get_temp_plot(img: io.BytesIO) -> None:
     """
     time_range_of_plot = 60 # This value determines the time range of the plot
     
-    sensor1 = get_temperature("sensor1", time_range_of_plot)
-    sensor2 = get_temperature("sensor2", time_range_of_plot)
+    sensor1, sensor2 = await asyncio.gather(
+        get_temperature("sensor1", time_range_of_plot),
+        get_temperature("sensor2", time_range_of_plot)
+    )
     
     x_1 = [i/3 for i in range(len(sensor1))]
     x_2 = [i/3 for i in range(len(sensor2))]
@@ -36,7 +39,7 @@ def get_temp_plot(img: io.BytesIO) -> None:
     figure.savefig(img, format='png')
     plt.close(figure)
 
-def get_pressure_plot(img: io.BytesIO) -> None:
+async def get_pressure_plot(img: io.BytesIO) -> None:
     """Creates a matplotlib plot and stores it in the given io buffer.
     
     Args:
@@ -44,8 +47,10 @@ def get_pressure_plot(img: io.BytesIO) -> None:
     """
     time_range_of_plot = 60 # This value determines the time range of the plot
     
-    sensor1 = get_pressure("sensor1", time_range_of_plot)
-    sensor2 = get_pressure("sensor2", time_range_of_plot)
+    sensor1, sensor2 = await asyncio.gather(
+        get_pressure("sensor1", time_range_of_plot),
+        get_pressure("sensor2", time_range_of_plot)
+    )
     
     x_1 = [i/3 for i in range(len(sensor1))]
     x_2 = [i/3 for i in range(len(sensor2))]
@@ -61,7 +66,7 @@ def get_pressure_plot(img: io.BytesIO) -> None:
     figure.savefig(img, format='png')
     plt.close(figure)
 
-def get_plot_by_type(type: str) -> str:
+async def get_plot_by_type(type: str) -> str:
     """Returns a base64 encoded image of a matplotlib plot.
     
     Args:
@@ -75,9 +80,9 @@ def get_plot_by_type(type: str) -> str:
     img = io.BytesIO()
     
     if type == "temperature":
-        get_temp_plot(img)
+        await get_temp_plot(img)
     elif type == "pressure":
-        get_pressure_plot(img)
+        await get_pressure_plot(img)
     else:
         raise ValueError("Invalid figure type")
     

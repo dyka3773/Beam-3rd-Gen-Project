@@ -1,5 +1,6 @@
+import asyncio
 import numpy as np
-import sqlite3 as sql
+import aiosqlite as sql
 import logging
 import time
 
@@ -7,51 +8,59 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # The following functions are used to get the status of each component of the system
 
-def get_motor_speed() -> int:
+async def get_motor_speed() -> int:
     """Gets the motor speed from the db.
 
     Returns:
         int: The motor speed.
     """
-    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
-        speed = db.execute('SELECT motor_speed FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+    async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
+        result = await db.execute('SELECT motor_speed FROM GS_data ORDER BY time DESC LIMIT 1')
+        speed = await result.fetchone()
+        speed = speed[0] # type: ignore
 
     return speed
 
-def get_sound_card_status() -> bool:
+async def get_sound_card_status() -> bool:
     """Gets the sound card status from the db.
 
     Returns:
         bool: The sound card status.
     """
-    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
-        status = db.execute('SELECT sound_card_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+    async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
+        result = await db.execute('SELECT sound_card_status FROM GS_data ORDER BY time DESC LIMIT 1')
+        status = await result.fetchone()
+        status = status[0] # type: ignore
     
     return status
 
-def get_camera_status() -> bool:
+async def get_camera_status() -> bool:
     """Gets the camera status from the db.
 
     Returns:
         bool: The camera status.
     """
-    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
-        status = db.execute('SELECT camera_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+    async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
+        result = await db.execute('SELECT camera_status FROM GS_data ORDER BY time DESC LIMIT 1')
+        status = await result.fetchone()
+        status = status[0] # type: ignore
     
     return status
 
-def get_heater_status() -> bool:
+async def get_heater_status() -> bool:
     """Gets the heater status from the db.
 
     Returns:
         bool: The heater status.
     """
-    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
-        status = db.execute('SELECT heater_status FROM GS_data ORDER BY time DESC LIMIT 1').fetchone()[0]
+    async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
+        result = await db.execute('SELECT heater_status FROM GS_data ORDER BY time DESC LIMIT 1')
+        status = await result.fetchone()
+        status = status[0] # type: ignore
     
     return status
 
-def get_temperature(sensor: str, time: int) -> list:
+async def get_temperature(sensor: str, time: int) -> list[int]:
     """Gets the temperature from the db.
 
     Args:
@@ -61,7 +70,7 @@ def get_temperature(sensor: str, time: int) -> list:
     Returns:
         list: The temperature values for the given time.
     """
-    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
+    async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         if sensor == 'sensor1':
             col = 'temp_1'
         elif sensor == 'sensor2':
@@ -69,18 +78,19 @@ def get_temperature(sensor: str, time: int) -> list:
         else:
             raise ValueError('Invalid sensor name')
         
-        temperature = db.execute(f'''SELECT {col} 
+        results = await db.execute(f'''SELECT {col}
                                         FROM GS_data
                                         WHERE time >= DATETIME('now', '-{time} seconds')
                                         ORDER BY time DESC
-                                ''').fetchall()
+                                ''')
+        temperature = await results.fetchall()
     
-    temperature.reverse()
+    temperature.reverse() # type: ignore
     logging.debug(f'Got temperature: {temperature}')
     
-    return temperature
+    return temperature # type: ignore
 
-def get_pressure(sensor: str, time: int) -> list:
+async def get_pressure(sensor: str, time: int) -> list[int]:
     """Gets the pressure from the db.
 
     Args:
@@ -90,7 +100,7 @@ def get_pressure(sensor: str, time: int) -> list:
     Returns:
         list: The pressure values for the given time.
     """
-    with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
+    async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         if sensor == 'sensor1':
             col = 'pressure_1'
         elif sensor == 'sensor2':
@@ -98,16 +108,17 @@ def get_pressure(sensor: str, time: int) -> list:
         else:
             raise ValueError('Invalid sensor name')
         
-        pressure = db.execute(f'''SELECT {col} 
-                                    FROM GS_data
-                                    WHERE time >= DATETIME('now', '-{time} seconds')
-                                    ORDER BY time DESC
-                                ''').fetchall()
+        results = await db.execute(f'''SELECT {col}
+                                        FROM GS_data
+                                        WHERE time >= DATETIME('now', '-{time} seconds')
+                                        ORDER BY time DESC
+                                    ''')
+        pressure = await results.fetchall()
     
-    pressure.reverse()
+    pressure.reverse() # type: ignore
     logging.debug(f'Got pressure: {pressure}')
     
-    return pressure
+    return pressure # type: ignore
 
 
 # The following functions are used to check the status of each component of the system. This means that they will check if the component is working properly.

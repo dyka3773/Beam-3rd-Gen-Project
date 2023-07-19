@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, url_for
-from flask_wtf.csrf import CSRFProtect
+
+import asyncio
 
 from controllers import home_page, downlink_page, uplink_page, figures as figs, status as experiment_status
 from controllers.tests import with_fluid, without_fluid
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-# csrf = CSRFProtect() # TODO: This is for CSRF protection. I don't know how to use it yet, if we uncomment this line, the plots won't reload.
-# csrf.init_app(app)
 
 @app.route('/')
 def index():
@@ -33,7 +32,7 @@ def test_without_fluid():
 # The following routes are for special purposes and do not serve any pages
 
 @app.route('/figures/<figure_name>')
-def figures(figure_name: str):
+async def figures(figure_name: str):
     """Sends an image to the client.
 
     Args:
@@ -43,23 +42,31 @@ def figures(figure_name: str):
         Returns a tuple containing the image and the HTTP status code.
     """
     if figure_name in figs.FIGURES:
-        return figs.get_plot_by_type(figure_name)
+        return await figs.get_plot_by_type(figure_name)
     else:
         app.logger.error(f"Figure not found. The requested figure name was: {figure_name}")
         return "Figure not found", 400
     
 @app.get('/status/')
-def status():
+async def status():
     """Gets the status of the system.
 
     Returns:
         Returns a tuple containing the status and the HTTP status code.
     """
+    
+    motor_speed, sound_card_status, camera_status, heater_status = await asyncio.gather(
+        experiment_status.get_motor_speed(),
+        experiment_status.get_sound_card_status(),
+        experiment_status.get_camera_status(),
+        experiment_status.get_heater_status()
+    )
+    
     status = {
-        'motor_speed': experiment_status.get_motor_speed(),
-        'sound_card_status': experiment_status.get_sound_card_status(),
-        'camera_status': experiment_status.get_camera_status(),
-        'heater_status': experiment_status.get_heater_status(),
+        'motor_speed': motor_speed,
+        'sound_card_status': sound_card_status,
+        'camera_status': camera_status,
+        'heater_status': heater_status,
     }
     return status, 200
 
@@ -95,9 +102,7 @@ def check(component: str):
         return "Component not found", 400
     
     app.logger.info(f"Component {component} status: {status}")
-    
-    # status = True # FIXME: This is just for testing purposes
-    
+        
     if status==True:
         return "OK", 200
     else:
