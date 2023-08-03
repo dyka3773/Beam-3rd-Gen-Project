@@ -138,7 +138,7 @@ def check_sound_card() -> bool:
     Returns:
         bool: The sound card status.
     """
-    time.sleep(1) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
+    # time.sleep(1) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def check_camera() -> bool:
@@ -147,7 +147,7 @@ def check_camera() -> bool:
     Returns:
         bool: The camera status.
     """
-    time.sleep(2) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
+    # time.sleep(2) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def check_heater() -> bool:
@@ -156,7 +156,7 @@ def check_heater() -> bool:
     Returns:
         bool: The heater status.
     """
-    time.sleep(3) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
+    # time.sleep(3) # FIXME: These sleep calls are here for TESTING purposes. They should be removed when the Uplink is implemented.
     return bool(np.random.randint(0,2)) # FIXME: This is a placeholder. It should be replaced with the actual value which will be read from the csv file
 
 def delete_data() -> bool:

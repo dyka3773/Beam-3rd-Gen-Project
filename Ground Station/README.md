@@ -6,4 +6,5 @@
 - [ ] Update info box with the latest information
 - [ ] Create page for the Uplink
 - [ ] During testing again the downlink data, there is an issue with multiple requests and the db locking the file
-- [X] Generate the CSV file with fake data but in real time with the proper format
+- [ ] Decouple the info section so that it presents the same data everywhere without having to copy paste the code
+- [ ] Write a Markdown file on how to use the software in the prespective of someone who has never used it before
