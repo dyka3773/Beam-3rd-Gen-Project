@@ -26,11 +26,11 @@ async def get_temp_plot(img: io.BytesIO) -> None:
         get_temperature("sensor2", time_range_of_plot)
     )
     
-    x_1 = [i/3 for i in range(len(sensor1))]
+    x_1 = [i/3 for i in range(len(sensor1))] # FIXME: This can probably be done in one line for every sensor so that we don't have to repeat the code
     x_2 = [i/3 for i in range(len(sensor2))]
     
     figure, ax = plt.subplots()
-    ax.plot(x_1,sensor1)
+    ax.plot(x_1,sensor1) # FIXME: This can probably be done in one line for every sensor so that we don't have to repeat the code
     ax.plot(x_2,sensor2)
     ax.set_title("Temperature Plot")
     ax.set_xlabel("Time (s)")
@@ -52,12 +52,12 @@ async def get_pressure_plot(img: io.BytesIO) -> None:
         get_pressure("sensor2", time_range_of_plot)
     )
     
-    x_1 = [i/3 for i in range(len(sensor1))]
+    x_1 = [i/3 for i in range(len(sensor1))] # FIXME: This can probably be done in one line for every sensor so that we don't have to repeat the code
     x_2 = [i/3 for i in range(len(sensor2))]
     
     
     figure, ax = plt.subplots()
-    ax.plot(x_1,sensor1)
+    ax.plot(x_1,sensor1) # FIXME: This can probably be done in one line for every sensor so that we don't have to repeat the code
     ax.plot(x_2,sensor2)
     ax.set_title("Pressure Plot")
     ax.set_xlabel("Time (s)")
