@@ -82,7 +82,6 @@ Please contact us if you want to use any of the information or ideas that are us
 ## Authors
 
 - Iraklis Konsoulas - [dyka3773](https://github.com/dyka3773)
-- Alexandros Korkos - [akorkos](https://github.com/akorkos)
-- Maria Doli - [mariadoli](https://github.com/mariadoli)
+- Katerina Zachari - [sugarstreet](https://github.com/sugarstreet)
 - Chrysa Episkopou - [xrysanthemo](https://github.com/xrysanthemo)
 - Maria Afentouli - [afentoulimaria](https://github.com/afentoulimaria)
