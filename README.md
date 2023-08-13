@@ -17,6 +17,7 @@ This is the repository of our project, where we will upload all the files that w
   - [Prerequisites](#prerequisites)
 - [Usage](#usage)
   - [Ground Station](#ground-station)
+  - [Rocket](#rocket)
   - [SED Stuff](#sed-stuff)
 - [Contributing](#contributing)
 - [License](#license)
@@ -45,6 +46,7 @@ pip install -r requirements.txt
 
 For now, the folders that have useful files are the following:
 - [Ground Station](./Ground%20Station/)
+- [Rocket](./Rocket/)
 - [SED Stuff](./SED%20Stuff/)
 
 And only the `Ground Station` folder has code in it.
@@ -61,6 +63,14 @@ run_server.bat
 ```
 
 This will run a server in the background, so you can access it by going to `localhost:8000` in your browser or (in other machines in your network) to your machine's IP address, followed by `:8000`.
+
+
+### Rocket
+
+This folder is used to store the code that will be used in the rocket.
+
+> This section will be updated when we have implemented more functionalities.
+
 
 ### SED Stuff
 
