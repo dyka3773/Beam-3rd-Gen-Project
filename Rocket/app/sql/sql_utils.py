@@ -3,11 +3,13 @@ import logging
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s', 
+    format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s', 
     filename='rocket.log',
     encoding='utf-8',
     filemode='a'
 )
+
+accepted_signal_names = ['LO', 'SOE', 'SODS', 'PO']
 
 
 def add_motor_speed(cursor: sqlite3.Cursor, motor_speed: int):
@@ -18,19 +20,27 @@ def add_motor_speed(cursor: sqlite3.Cursor, motor_speed: int):
         cursor (sqlite3.Cursor): The cursor of the database.
         motor_speed (int): The motor speed to be added to the database.
     """
-    prev_motor_speed, last_time = cursor.execute("""
-                                        SELECT motor_speed, time FROM rocket_data ORDER BY time DESC LIMIT 1
-                                    """).fetchone()
-    if prev_motor_speed is not None:
+    result = cursor.execute("""
+                                SELECT motor_speed, time FROM rocket_data ORDER BY time DESC LIMIT 1
+                            """).fetchone()
+    if result is None:
         cursor.execute("""
                         INSERT INTO rocket_data (motor_speed) VALUES (?)
                     """, (motor_speed,))
         logging.info(f'Added a new row with motor speed: {motor_speed}')
     else:
-        cursor.execute("""
-                        UPDATE rocket_data SET motor_speed = ? WHERE time = ?
-                    """, (motor_speed, last_time))
-        logging.info(f"Updated the timestamp '{last_time}' with motor speed: {motor_speed}")
+        prev_motor_speed, last_time = result
+    
+        if prev_motor_speed is not None:
+            cursor.execute("""
+                            INSERT INTO rocket_data (motor_speed) VALUES (?)
+                        """, (motor_speed,))
+            logging.info(f'Added a new row with motor speed: {motor_speed}')
+        else:
+            cursor.execute("""
+                            UPDATE rocket_data SET motor_speed = ? WHERE time = ?
+                        """, (motor_speed, last_time))
+            logging.info(f"Updated the timestamp '{last_time}' with motor speed: {motor_speed}")
 
    
 def add_sound_card_status(cursor: sqlite3.Cursor, sound_card_status: int):
@@ -41,19 +51,27 @@ def add_sound_card_status(cursor: sqlite3.Cursor, sound_card_status: int):
         cursor (sqlite3.Cursor): The cursor of the database.
         sound_card_status (int): The sound card status to be added to the database.
     """
-    prev_sound_card_status, last_time = cursor.execute("""
-                                        SELECT sound_card_status, time FROM rocket_data ORDER BY time DESC LIMIT 1
-                                    """).fetchone()
-    if prev_sound_card_status is not None:
+    results = cursor.execute("""
+                                SELECT sound_card_status, time FROM rocket_data ORDER BY time DESC LIMIT 1
+                            """).fetchone()
+    if results is None:
         cursor.execute("""
                         INSERT INTO rocket_data (sound_card_status) VALUES (?)
                     """, (sound_card_status,))
         logging.info(f'Added a new row with sound card status: {sound_card_status}')
     else:
-        cursor.execute("""
-                        UPDATE rocket_data SET sound_card_status = ? WHERE time = ?
-                    """, (sound_card_status, last_time))
-        logging.info(f"Updated the timestamp '{last_time}' with sound card status: {sound_card_status}")
+        prev_sound_card_status, last_time = results
+        
+        if prev_sound_card_status is not None:
+            cursor.execute("""
+                            INSERT INTO rocket_data (sound_card_status) VALUES (?)
+                        """, (sound_card_status,))
+            logging.info(f'Added a new row with sound card status: {sound_card_status}')
+        else:
+            cursor.execute("""
+                            UPDATE rocket_data SET sound_card_status = ? WHERE time = ?
+                        """, (sound_card_status, last_time))
+            logging.info(f"Updated the timestamp '{last_time}' with sound card status: {sound_card_status}")
     
 
 def add_camera_status(cursor: sqlite3.Cursor, camera_status: int):
@@ -64,19 +82,27 @@ def add_camera_status(cursor: sqlite3.Cursor, camera_status: int):
         cursor (sqlite3.Cursor): The cursor of the database.
         camera_status (int): The camera status to be added to the database.
     """
-    prev_camera_status, last_time = cursor.execute("""
+    results = cursor.execute("""
                                         SELECT camera_status, time FROM rocket_data ORDER BY time DESC LIMIT 1
                                     """).fetchone()
-    if prev_camera_status is not None:
+    if results is None:
         cursor.execute("""
                         INSERT INTO rocket_data (camera_status) VALUES (?)
                     """, (camera_status,))
         logging.info(f'Added a new row with camera status: {camera_status}')
     else:
-        cursor.execute("""
-                        UPDATE rocket_data SET camera_status = ? WHERE time = ?
-                    """, (camera_status, last_time))
-        logging.info(f"Updated the timestamp '{last_time}' with camera status: {camera_status}")
+        prev_camera_status, last_time = results
+        
+        if prev_camera_status is not None:
+            cursor.execute("""
+                            INSERT INTO rocket_data (camera_status) VALUES (?)
+                        """, (camera_status,))
+            logging.info(f'Added a new row with camera status: {camera_status}')
+        else:
+            cursor.execute("""
+                            UPDATE rocket_data SET camera_status = ? WHERE time = ?
+                        """, (camera_status, last_time))
+            logging.info(f"Updated the timestamp '{last_time}' with camera status: {camera_status}")
 
 
 def add_heater_status(cursor: sqlite3.Cursor, heater_status: bool):
@@ -87,19 +113,27 @@ def add_heater_status(cursor: sqlite3.Cursor, heater_status: bool):
         cursor (sqlite3.Cursor): The cursor of the database.
         heater_status (bool): The heater status to be added to the database.
     """
-    prev_heater_status, last_time = cursor.execute("""
+    results = cursor.execute("""
                                         SELECT heater_status, time FROM rocket_data ORDER BY time DESC LIMIT 1
                                     """).fetchone()
-    if prev_heater_status is not None:
+    if results is None:
         cursor.execute("""
                         INSERT INTO rocket_data (heater_status) VALUES (?)
                     """, (heater_status,))
         logging.info(f'Added a new row with heater status: {heater_status}')
     else:
-        cursor.execute("""
-                        UPDATE rocket_data SET heater_status = ? WHERE time = ?
-                    """, (heater_status, last_time))
-        logging.info(f"Updated the timestamp '{last_time}' with heater status: {heater_status}")
+        prev_heater_status, last_time = results
+        
+        if prev_heater_status is not None:
+            cursor.execute("""
+                            INSERT INTO rocket_data (heater_status) VALUES (?)
+                        """, (heater_status,))
+            logging.info(f'Added a new row with heater status: {heater_status}')
+        else:
+            cursor.execute("""
+                            UPDATE rocket_data SET heater_status = ? WHERE time = ?
+                        """, (heater_status, last_time))
+            logging.info(f"Updated the timestamp '{last_time}' with heater status: {heater_status}")
         
 
 def add_temp_to_sensor(cursor: sqlite3.Cursor, temp: float, sensor_num: int):
@@ -111,19 +145,27 @@ def add_temp_to_sensor(cursor: sqlite3.Cursor, temp: float, sensor_num: int):
         temp (float): The temperature of the sensor to be added to the database.
         sensor_num (int): The number of the sensor to be added to the database.
     """
-    prev_temp, last_time = cursor.execute("""
+    results = cursor.execute("""
                                         SELECT temp_{}, time FROM rocket_data ORDER BY time DESC LIMIT 1
                                     """.format(sensor_num)).fetchone()
-    if prev_temp is not None:
+    if results is None:
         cursor.execute("""
                         INSERT INTO rocket_data (temp_{}) VALUES (?)
                     """.format(sensor_num), (temp,))
         logging.info(f'Added a new row with temperature of sensor {sensor_num}: {temp}')
     else:
-        cursor.execute("""
-                        UPDATE rocket_data SET temp_{} = ? WHERE time = ?
-                    """.format(sensor_num), (temp, last_time))
-        logging.info(f"Updated the timestamp '{last_time}' with temperature of sensor {sensor_num}: {temp}")
+        prev_temp, last_time = results
+        
+        if prev_temp is not None:
+            cursor.execute("""
+                            INSERT INTO rocket_data (temp_{}) VALUES (?)
+                        """.format(sensor_num), (temp,))
+            logging.info(f'Added a new row with temperature of sensor {sensor_num}: {temp}')
+        else:
+            cursor.execute("""
+                            UPDATE rocket_data SET temp_{} = ? WHERE time = ?
+                        """.format(sensor_num), (temp, last_time))
+            logging.info(f"Updated the timestamp '{last_time}' with temperature of sensor {sensor_num}: {temp}")
 
         
 def add_pressure_to_sensor(cursor: sqlite3.Cursor, pressure: float, sensor_num: int):
@@ -135,19 +177,27 @@ def add_pressure_to_sensor(cursor: sqlite3.Cursor, pressure: float, sensor_num: 
         pressure (float): The pressure of the sensor to be added to the database.
         sensor_num (int): The number of the sensor to be added to the database.
     """
-    prev_pressure, last_time = cursor.execute("""
+    results = cursor.execute("""
                                         SELECT pressure_{}, time FROM rocket_data ORDER BY time DESC LIMIT 1
                                     """.format(sensor_num)).fetchone()
-    if prev_pressure is not None:
+    if results is None:
         cursor.execute("""
                         INSERT INTO rocket_data (pressure_{}) VALUES (?)
                     """.format(sensor_num), (pressure,))
         logging.info(f'Added a new row with pressure of sensor {sensor_num}: {pressure}')
     else:
-        cursor.execute("""
-                        UPDATE rocket_data SET pressure_{} = ? WHERE time = ?
-                    """.format(sensor_num), (pressure, last_time))
-        logging.info(f"Updated the timestamp '{last_time}' with pressure of sensor {sensor_num}: {pressure}")
+        prev_pressure, last_time = results
+        
+        if prev_pressure is not None:
+            cursor.execute("""
+                            INSERT INTO rocket_data (pressure_{}) VALUES (?)
+                        """.format(sensor_num), (pressure,))
+            logging.info(f'Added a new row with pressure of sensor {sensor_num}: {pressure}')
+        else:
+            cursor.execute("""
+                            UPDATE rocket_data SET pressure_{} = ? WHERE time = ?
+                        """.format(sensor_num), (pressure, last_time))
+            logging.info(f"Updated the timestamp '{last_time}' with pressure of sensor {sensor_num}: {pressure}")
 
 
 def add_signal_status(cursor: sqlite3.Cursor, signal_status: bool, signal_name: str):
@@ -158,25 +208,31 @@ def add_signal_status(cursor: sqlite3.Cursor, signal_status: bool, signal_name: 
         cursor (sqlite3.Cursor): The cursor of the database.
         signal_status (bool): The status of the signal to be added to the database.
         signal_name (str): The name of the signal to be added to the database. Accepted values: LO, SOE, SODS, PO
-    """
-    accepted_signal_names = ['LO', 'SOE', 'SODS', 'PO']
-    
+    """    
     if signal_name not in accepted_signal_names:
         raise ValueError(f'Invalid signal name. Accepted values: {accepted_signal_names}')
     
-    prev_signal_status, last_time = cursor.execute("""
+    results = cursor.execute("""
                                         SELECT {}_signal, time FROM rocket_data ORDER BY time DESC LIMIT 1
                                     """.format(signal_name)).fetchone()
-    if prev_signal_status is not None:
+    if results is None:
         cursor.execute("""
                         INSERT INTO rocket_data ({}_signal) VALUES (?)
                     """.format(signal_name), (signal_status,))
         logging.info(f'Added a new row with {signal_name} signal status: {signal_status}')
     else:
-        cursor.execute("""
-                        UPDATE rocket_data SET {}_signal = ? WHERE time = ?
-                    """.format(signal_name), (signal_status, last_time))
-        logging.info(f"Updated the timestamp '{last_time}' with {signal_name} signal status: {signal_status}")
+        prev_signal_status, last_time = results
+        
+        if prev_signal_status is not None:
+            cursor.execute("""
+                            INSERT INTO rocket_data ({}_signal) VALUES (?)
+                        """.format(signal_name), (signal_status,))
+            logging.info(f'Added a new row with {signal_name} signal status: {signal_status}')
+        else:
+            cursor.execute("""
+                            UPDATE rocket_data SET {}_signal = ? WHERE time = ?
+                        """.format(signal_name), (signal_status, last_time))
+            logging.info(f"Updated the timestamp '{last_time}' with {signal_name} signal status: {signal_status}")
 
 
 def add_error_code(cursor: sqlite3.Cursor, error_code: int):
@@ -190,3 +246,137 @@ def add_error_code(cursor: sqlite3.Cursor, error_code: int):
                         INSERT INTO rocket_data (error_code) VALUES (?)
                     """, (error_code,))
     logging.info(f'Added a new row with error code: {error_code}')
+    
+    
+def get_motor_speed(cursor: sqlite3.Cursor) -> int:
+    """Returns the motor speed from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+    
+    Returns:
+        int: The motor speed from the database.
+    """
+    return cursor.execute("""
+                            SELECT motor_speed FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """).fetchone()[0]
+    
+
+def get_sound_card_status(cursor: sqlite3.Cursor) -> int:
+    """Returns the sound card status from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+    
+    Returns:
+        int: The sound card status from the database.
+    """
+    return cursor.execute("""
+                            SELECT sound_card_status FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """).fetchone()[0]
+    
+
+def get_camera_status(cursor: sqlite3.Cursor) -> int:
+    """Returns the camera status from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+    
+    Returns:
+        int: The camera status from the database.
+    """
+    return cursor.execute("""
+                            SELECT camera_status FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """).fetchone()[0]
+    
+
+def get_heater_status(cursor: sqlite3.Cursor) -> bool:
+    """Returns the heater status from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+    
+    Returns:
+        bool: The heater status from the database.
+    """
+    status = cursor.execute("""
+                            SELECT heater_status FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """).fetchone()[0]
+    return bool(status)
+    
+
+def get_temp_of_sensor(cursor: sqlite3.Cursor, sensor_num: int) -> float:
+    """Returns the temperature of the specified sensor from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+        sensor_num (int): The number of the sensor to be added to the database.
+    
+    Returns:
+        float: The temperature of the specified sensor from the database.
+    """
+    return cursor.execute("""
+                            SELECT temp_{} FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """.format(sensor_num)).fetchone()[0]
+    
+
+def get_pressure_of_sensor(cursor: sqlite3.Cursor, sensor_num: int) -> float:
+    """Returns the pressure of the specified sensor from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+        sensor_num (int): The number of the sensor to be added to the database.
+    
+    Returns:
+        float: The pressure of the specified sensor from the database.
+    """
+    return cursor.execute("""
+                            SELECT pressure_{} FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """.format(sensor_num)).fetchone()[0]
+    
+
+def get_status_of_signal(cursor: sqlite3.Cursor, signal_name: str) -> bool:
+    """Returns the status of the specified signal from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+        signal_name (str): The name of the signal to be added to the database. Accepted values: LO, SOE, SODS, PO
+    
+    Returns:
+        bool: The status of the specified signal from the database.
+    """
+    
+    if signal_name not in accepted_signal_names:
+        raise ValueError(f'Invalid signal name. Accepted values: {accepted_signal_names}')
+    
+    return bool(cursor.execute("""
+                            SELECT {}_signal FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """.format(signal_name)).fetchone()[0])
+    
+
+def get_error_code(cursor: sqlite3.Cursor) -> int:
+    """Returns the error code from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+    
+    Returns:
+        int: The error code from the database.
+    """
+    return cursor.execute("""
+                            SELECT error_code FROM rocket_data ORDER BY time DESC LIMIT 1
+                        """).fetchone()[0]
+
+
+def get_first_row_of_all_data(cursor: sqlite3.Cursor) -> tuple:
+    """Returns the first row of all data from the database.
+    
+    Args:
+        cursor (sqlite3.Cursor): The cursor of the database.
+    
+    Returns:
+        tuple: The first row of all data from the database.
+    """
+    return cursor.execute("""
+                            SELECT * FROM rocket_data ORDER BY time ASC LIMIT 1
+                        """).fetchone()

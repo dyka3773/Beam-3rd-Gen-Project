@@ -6,8 +6,8 @@ sys.path.append(parent)
 # The above code is a hack used to import modules from the parent directory. 
 # NOTE: I DO NOT recommend using this in production code.
 
-from StoreData import StoreData
-from ErrorCode import ErrorCode
+from DataStorage import DataStorage
+from ErrorHandling.ErrorCode import ErrorCode
 
 class CustomException(Exception):    
     
@@ -16,7 +16,7 @@ class CustomException(Exception):
         self.error = error
         self.error_code = error.value
         
-        StoreData().save_error_code(self.error_code)
+        DataStorage().save_error_code(self.error_code)
 
     def __str__(self):
         return f'{self.message} (Error code: {self.error_code})'

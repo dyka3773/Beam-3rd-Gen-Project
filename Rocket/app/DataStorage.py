@@ -4,13 +4,13 @@ from sql import sql_utils as sqlu
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s', 
+    format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s', 
     filename='rocket.log',
     encoding='utf-8',
     filemode='a'
 )
 
-class StoreData:
+class DataStorage:
     """A class to store data in a database.
     
     NOTE: It follows the singleton design pattern so that only one instance of the class can be created.
@@ -154,3 +154,129 @@ class StoreData:
             cursor = db.cursor()
             sqlu.add_error_code(cursor, error_code)
             db.commit()
+            
+    def get_motor_speed(self):
+        """Gets the speed of the motor from the database.
+        
+        Returns:
+            int: The speed of the motor in (rpm?)
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            speed = sqlu.get_motor_speed(cursor)
+            db.commit()
+        
+        return speed
+    
+    def get_sound_card_status(self):
+        """Gets the status of the sound card from the database.
+        
+        Returns:
+            int: The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            status = sqlu.get_sound_card_status(cursor)
+            db.commit()
+        
+        return status
+    
+    def get_camera_status(self):
+        """Gets the status of the camera from the database.
+        
+        Returns:
+            int: The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            status = sqlu.get_camera_status(cursor)
+            db.commit()
+        
+        return status
+    
+    def get_heater_status(self):
+        """Gets the status of the heater from the database.
+        
+        Returns:
+            bool: The status of the heater. Possible values: 0 = OFF, 1 = ON
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            status = sqlu.get_heater_status(cursor)
+            db.commit()
+        
+        return status
+    
+    def get_temperature_of_sensor(self, sensor_num: int):
+        """Gets the temperature of a specified sensor from the database.
+        
+        Args:
+            sensor_num (int): The number of the sensor to get the temperature from.
+        
+        Returns:
+            float: The temperature of the specified sensor.
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            temp = sqlu.get_temp_of_sensor(cursor, sensor_num)
+            db.commit()
+        
+        return temp
+    
+    def get_pressure_of_sensor(self, sensor_num: int):
+        """Gets the pressure of a specified sensor from the database.
+        
+        Args:
+            sensor_num (int): The number of the sensor to get the pressure from.
+        
+        Returns:
+            float: The pressure of the specified sensor.
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            pressure = sqlu.get_pressure_of_sensor(cursor, sensor_num)
+            db.commit()
+        
+        return pressure
+    
+    def get_status_of_signal(self, signal_name: str):
+        """Gets the status of a specified signal from the database.
+        
+        Args:
+            signal_name (str): The name of the signal to get the status from.
+        
+        Returns:
+            bool: The status of the specified signal.
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            status = sqlu.get_status_of_signal(cursor, signal_name)
+            db.commit()
+        
+        return status
+    
+    def get_error_code(self):
+        """Gets the error code of the system from the database.
+        
+        Returns:
+            int: The error code of the system.
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            error_code = sqlu.get_error_code(cursor)
+            db.commit()
+        
+        return error_code
+    
+    def get_first_row_of_all_data(self):
+        """Gets the first row of all the data from the database.
+        
+        Returns:
+            tuple: The first row of all the data from the database.
+        """
+        with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = db.cursor()
+            data = sqlu.get_first_row_of_all_data(cursor)
+            db.commit()
+        
+        return data        
