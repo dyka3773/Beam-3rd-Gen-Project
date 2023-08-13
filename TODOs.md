@@ -27,6 +27,10 @@
 - [ ] Implement the commands of the camera in Python.
 - [ ] Start writing the outline of the code for the components of the rocket by just adding placeholders for the functions that will be needed.
 
+### IPR 2 Feedback
+
+- [ ] An option to “enable automatic timeline” so that after the initial checks, the “launch timeline” can start.
+- [ ] It is recommended to have different “modes” that allow the team to switch e.g. between test and flight mode.
 
 ## Telecomms
 
