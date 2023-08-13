@@ -1,6 +1,6 @@
 ## Current Status
 
-TODO: Complete this section
+(Described the current status by going through what the slide said)
 
 ## In General
 
