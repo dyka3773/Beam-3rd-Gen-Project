@@ -18,14 +18,16 @@
   - [ ] It is recommended to have different “modes” that allow the team to switch e.g. between test and flight mode.
 
 
-### Possible Improvements
-
-- Concurrency with asyncio on the data storing functionality (but idk whether it's needed until we conduct testing). Duration to implement: 2-3 days.
-
 ## Rocket
 
 - [ ] Implement the commands of the camera in Python.
 - [ ] Start writing the outline of the code for the components of the rocket by just adding placeholders for the functions that will be needed.
+  - [X] MotorController
+  - [X] HeaterController
+  - [ ] SoundCardController
+  - [ ] CameraController
+  - [X] Concurrency
+- [ ] BUG: In case of fluctuations in the temperatures below and above the threshold, the heater will be turned on and off every instant of a second. This is not good for the heater and for the SW in general because it will create infinite rows in the DB. There should be a way to lower the frequency of the temperature readings by the heater.
 
 ### IPR 2 Feedback
 
