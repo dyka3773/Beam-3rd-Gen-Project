@@ -2,7 +2,7 @@ import asyncio # NOTE: This might change eventually to the threading module
 import logging
 import time
 
-from MotorController import run_motor_cycle
+from Motor.MotorController import run_motor_cycle
 
 logging.basicConfig(
     level=logging.INFO,

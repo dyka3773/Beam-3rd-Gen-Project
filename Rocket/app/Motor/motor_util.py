@@ -1,16 +1,8 @@
-import sys
-import os
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-# The above code is a hack used to import modules from the parent directory. 
-# NOTE: I DO NOT recommend using this in production code.
-
 import logging
 
 from DataStorage import DataStorage
 from ErrorHandling.CustomException import CustomException
-from ErrorHandling.ErrorCode import ErrorCode
+from Enums.ErrorCodeEnum import ErrorCodeEnum
 import Motor.motor_driver as motor
 
 logging.basicConfig(
@@ -41,14 +33,14 @@ async def run_motor(speed : int) -> None | CustomException:
     if avg_temp is None or avg_temp > 50 or avg_temp < 0: # TODO: Change the values to the correct ones
         raise CustomException(
             f'The temperature is too high or too low or null. The average temperature is {avg_temp=}.',
-            ErrorCode.OVERHEAT_ERROR
+            ErrorCodeEnum.OVERHEAT_ERROR
         )
     
     avg_pressure = await get_avg_pressure() # FIXME: These are just placeholders. IDK if we actually need to get the average temperature and pressure.
     if avg_pressure is None or avg_pressure > 100 or avg_pressure < 0: # TODO: Change the values to the correct ones
         raise CustomException(
             f'The pressure is too high or too low or null. The average pressure is {avg_pressure=}', 
-            ErrorCode.OVERPRESSURE_ERROR
+            ErrorCodeEnum.OVERPRESSURE_ERROR
         )
     
     logging.debug('The other components are working as expected')

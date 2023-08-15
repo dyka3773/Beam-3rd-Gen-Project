@@ -1,6 +1,6 @@
 from enum import Enum
 
-class ErrorCode(Enum):
+class ErrorCodeEnum(Enum):
     """An enum to store the error codes and their messages.
     
     NOTE: The error codes are stored in the database as integers.
@@ -27,7 +27,7 @@ class ErrorCode(Enum):
         Returns:
             ErrorCode: The error code with the given value.
         """
-        for code in ErrorCode:
+        for code in ErrorCodeEnum:
             if code.value == value:
                 return code
         return None

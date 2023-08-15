@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Timeline(Enum):
+class TimelineEnum(Enum):
     """An enum to store the timeline of the rocket."""
     
     POWER_ON = -600 # Power on everything

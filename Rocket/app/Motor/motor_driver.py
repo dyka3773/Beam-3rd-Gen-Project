@@ -1,4 +1,3 @@
-
 def run(speed : int):
     """Runs the motor at the given speed.
     
