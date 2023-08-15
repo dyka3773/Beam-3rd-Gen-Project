@@ -1,9 +1,9 @@
 import logging
 
-from DataStorage import DataStorage
 from ErrorHandling.CustomException import CustomException
-from Enums.ErrorCodeEnum import ErrorCodeEnum
+from Enums.ErrorCodesEnum import ErrorCodesEnum
 import Motor.motor_driver as motor
+from utils.data_handling_utils import get_avg_temp, get_avg_pressure
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,17 +30,17 @@ async def run_motor(speed : int) -> None | CustomException:
     
     logging.debug('Checking if the other components are working as expected')
     avg_temp = await get_avg_temp() # FIXME: These are just placeholders. IDK if we actually need to get the average temperature and pressure.
-    if avg_temp is None or avg_temp > 50 or avg_temp < 0: # TODO: Change the values to the correct ones
+    if avg_temp is None or avg_temp > 50 or avg_temp < 0: # TODO: Change the values to the correct ones by consulting the Mechanical and the Science teams
         raise CustomException(
             f'The temperature is too high or too low or null. The average temperature is {avg_temp=}.',
-            ErrorCodeEnum.OVERHEAT_ERROR
+            ErrorCodesEnum.OVERHEAT_ERROR
         )
     
     avg_pressure = await get_avg_pressure() # FIXME: These are just placeholders. IDK if we actually need to get the average temperature and pressure.
-    if avg_pressure is None or avg_pressure > 100 or avg_pressure < 0: # TODO: Change the values to the correct ones
+    if avg_pressure is None or avg_pressure > 100 or avg_pressure < 0: # TODO: Change the values to the correct ones by consulting the Mechanical and the Science teams
         raise CustomException(
             f'The pressure is too high or too low or null. The average pressure is {avg_pressure=}', 
-            ErrorCodeEnum.OVERPRESSURE_ERROR
+            ErrorCodesEnum.OVERPRESSURE_ERROR
         )
     
     logging.debug('The other components are working as expected')
@@ -54,35 +54,3 @@ async def run_motor(speed : int) -> None | CustomException:
 def stop_motor_at_the_edge_of_the_cell():
     """Stops the motor at the edge of the cell."""
     raise NotImplementedError('This function is not implemented yet.')
-    
-async def get_avg_temp() -> float | None:
-    """Returns the average temperature of the two temperature sensors.
-    
-    Returns:
-        float: The average temperature of the two temperature sensors.
-    """
-    
-    # FIXME: This can be sooo optimized.
-    
-    temp_list = [DataStorage().get_temperature_of_sensor(i) for i in range(1, 3)]
-    
-    if None in temp_list:
-        return None
-    
-    return sum(temp_list) / len(temp_list)
-
-async def get_avg_pressure() -> float | None:
-    """Returns the average pressure of the two pressure sensors.
-    
-    Returns:
-        float: The average pressure of the two pressure sensors.
-    """
-    
-    # FIXME: This can be sooo optimized.
-    
-    pressure_list = [DataStorage().get_pressure_of_sensor(i) for i in range(1, 3)]
-    
-    if None in pressure_list:
-        return None
-    
-    return sum(pressure_list) / len(pressure_list)

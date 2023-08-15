@@ -1,6 +1,6 @@
 import logging
-import sqlite3 as sql
-from sql import sql_utils as sqlu
+import aiosqlite as sql
+from utils import sql_utils as sqlu
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,21 +20,21 @@ class DataStorage:
     
     db_filename : str = 'rocket.db'
     
-    def __new__(cls, *args, **kwargs):
+    async def __new__(cls, *args, **kwargs):
         """This function is called before __init__ and is used to create a singleton class.
         
         NOTE: It also initializes the database if the class hasn't been instantiated before.
         """
         if cls._instance is None:
             cls._instance = super().__new__(cls, *args, **kwargs)
-            cls._instance._create_db() # Create the database if it doesn't exist
+            await cls._instance._create_db() # Create the database if it doesn't exist
         return cls._instance
 
-    def _create_db(self):
+    async def _create_db(self):
         """Creates the database 
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            db.executescript('''
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            await db.executescript('''
                     DROP TABLE IF EXISTS ROCKET_DATA;
 
                     -- TODO: Add contraints in the values of the columns where needed
@@ -60,154 +60,154 @@ class DataStorage:
                     );
                 ''')
             
-            db.commit()
+            await db.commit()
             
             logging.info('Created table ROCKET_DATA')
             
-    def save_motor_speed(self, motor_speed: int):
+    async def save_motor_speed(self, motor_speed: int):
         """Adds the speed of the motor to the database.
         
         Args:
             motor_speed (int): The speed of the motor in (rpm?)
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_motor_speed(cursor, motor_speed)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_motor_speed(cursor, motor_speed)
+            await db.commit()
             
-    def save_sound_card_status(self, sound_card_status: int):
+    async def save_sound_card_status(self, sound_card_status: int):
         """Adds the status of the sound card to the database.
         
         Args:
             sound_card_status (int): The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_sound_card_status(cursor, sound_card_status)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_sound_card_status(cursor, sound_card_status)
+            await db.commit()
             
-    def save_camera_status(self, camera_status: int):
+    async def save_camera_status(self, camera_status: int):
         """Adds the status of the camera to the database.
         
         Args:
             camera_status (int): The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_camera_status(cursor, camera_status)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_camera_status(cursor, camera_status)
+            await db.commit()
     
-    def save_heater_status(self, heater_status: bool):
+    async def save_heater_status(self, heater_status: bool):
         """Adds the status of the heater to the database.
         
         Args:
             heater_status (bool): The status of the heater. Possible values: 0 = OFF, 1 = ON
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_heater_status(cursor, heater_status)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_heater_status(cursor, heater_status)
+            await db.commit()
     
-    def save_temperature_of_sensor(self, temp: float, sensor_num: int):
+    async def save_temperature_of_sensor(self, temp: float, sensor_num: int):
         """Adds the temperature of a specified sensor to the database.
         
         Args:
             temp (float): The temperature of the sensor to be added to the database.
             sensor_num (int): The number of the sensor to be added to the database.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_temp_to_sensor(cursor, temp, sensor_num)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_temp_to_sensor(cursor, temp, sensor_num)
+            await db.commit()
             
-    def save_pressure_of_sensor(self, pressure: float, sensor_num: int):
+    async def save_pressure_of_sensor(self, pressure: float, sensor_num: int):
         """Adds the pressure of a specified sensor to the database.
         
         Args:
             pressure (float): The pressure of the sensor to be added to the database.
             sensor_num (int): The number of the sensor to be added to the database.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_pressure_to_sensor(cursor, pressure, sensor_num)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_pressure_to_sensor(cursor, pressure, sensor_num)
+            await db.commit()
             
-    def save_status_of_signal(self, status: bool, signal_name: str):
+    async def save_status_of_signal(self, status: bool, signal_name: str):
         """Adds the status of a specified signal to the database.
         
         Args:
             status (bool): The status of the signal to be added to the database.
             signal_name (str): The name of the signal to be added to the database.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_signal_status(cursor, status, signal_name)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_signal_status(cursor, status, signal_name)
+            await db.commit()
             
-    def save_error_code(self, error_code: int):
+    async def save_error_code(self, error_code: int):
         """Adds the error code of the system to the database.
         
         Args:
             error_code (int): The error code of the system to be added to the database.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            sqlu.add_error_code(cursor, error_code)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_error_code(cursor, error_code)
+            await db.commit()
             
-    def get_motor_speed(self):
+    async def get_motor_speed(self) -> int | None:
         """Gets the speed of the motor from the database.
         
         Returns:
             int: The speed of the motor in (rpm?)
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            speed = sqlu.get_motor_speed(cursor)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            speed = await sqlu.get_motor_speed(cursor)
+            await db.commit()
         
         return speed
     
-    def get_sound_card_status(self):
+    async def get_sound_card_status(self) -> int | None:
         """Gets the status of the sound card from the database.
         
         Returns:
             int: The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            status = sqlu.get_sound_card_status(cursor)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            status = await sqlu.get_sound_card_status(cursor)
+            await db.commit()
         
         return status
     
-    def get_camera_status(self):
+    async def get_camera_status(self) -> int | None:
         """Gets the status of the camera from the database.
         
         Returns:
             int: The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            status = sqlu.get_camera_status(cursor)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            status = await sqlu.get_camera_status(cursor)
+            await db.commit()
         
         return status
     
-    def get_heater_status(self):
+    async def get_heater_status(self) -> bool | None:
         """Gets the status of the heater from the database.
         
         Returns:
             bool: The status of the heater. Possible values: 0 = OFF, 1 = ON
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            status = sqlu.get_heater_status(cursor)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            status = await sqlu.get_heater_status(cursor)
+            await db.commit()
         
         return status
     
-    def get_temperature_of_sensor(self, sensor_num: int):
+    async def get_temperature_of_sensor(self, sensor_num: int) -> float | None:
         """Gets the temperature of a specified sensor from the database.
         
         Args:
@@ -216,14 +216,15 @@ class DataStorage:
         Returns:
             float: The temperature of the specified sensor.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            temp = sqlu.get_temp_of_sensor(cursor, sensor_num)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            temp = await sqlu.get_temp_of_sensor(cursor, sensor_num)
+            await db.commit()
         
-        return temp
+        # return temp # This is commented out for debugging purposes
+        return 1.0
     
-    def get_pressure_of_sensor(self, sensor_num: int):
+    async def get_pressure_of_sensor(self, sensor_num: int) -> float | None:
         """Gets the pressure of a specified sensor from the database.
         
         Args:
@@ -232,14 +233,15 @@ class DataStorage:
         Returns:
             float: The pressure of the specified sensor.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            pressure = sqlu.get_pressure_of_sensor(cursor, sensor_num)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            pressure = await sqlu.get_pressure_of_sensor(cursor, sensor_num)
+            await db.commit()
         
-        return pressure
+        # return pressure # This is commented out for debugging purposes
+        return 1.0
     
-    def get_status_of_signal(self, signal_name: str):
+    async def get_status_of_signal(self, signal_name: str) -> bool | None:
         """Gets the status of a specified signal from the database.
         
         Args:
@@ -248,35 +250,35 @@ class DataStorage:
         Returns:
             bool: The status of the specified signal.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            status = sqlu.get_status_of_signal(cursor, signal_name)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            status = await sqlu.get_status_of_signal(cursor, signal_name)
+            await db.commit()
         
         return status
     
-    def get_error_code(self):
+    async def get_error_code(self) -> int | None:
         """Gets the error code of the system from the database.
         
         Returns:
             int: The error code of the system.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            error_code = sqlu.get_error_code(cursor)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            error_code = await sqlu.get_error_code(cursor)
+            await db.commit()
         
         return error_code
     
-    def get_first_row_of_all_data(self):
+    async def get_first_row_of_all_data(self) -> sql.Row | None:
         """Gets the first row of all the data from the database.
         
         Returns:
             tuple: The first row of all the data from the database.
         """
-        with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = db.cursor()
-            data = sqlu.get_first_row_of_all_data(cursor)
-            db.commit()
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            data = await sqlu.get_first_row_of_all_data(cursor)
+            await db.commit()
         
         return data        

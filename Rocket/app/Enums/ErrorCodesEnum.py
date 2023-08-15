@@ -1,6 +1,6 @@
 from enum import Enum
 
-class ErrorCodeEnum(Enum):
+class ErrorCodesEnum(Enum):
     """An enum to store the error codes and their messages.
     
     NOTE: The error codes are stored in the database as integers.
@@ -16,6 +16,7 @@ class ErrorCodeEnum(Enum):
     UNKNOWN_ERROR = 9
     OVERHEAT_ERROR = 10
     OVERPRESSURE_ERROR = 11
+    TEMP_SENSOR_NULL_ERROR = 12
     
     @staticmethod
     def from_value(value: int):
@@ -27,7 +28,7 @@ class ErrorCodeEnum(Enum):
         Returns:
             ErrorCode: The error code with the given value.
         """
-        for code in ErrorCodeEnum:
+        for code in ErrorCodesEnum:
             if code.value == value:
                 return code
         return None
