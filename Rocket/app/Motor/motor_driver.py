@@ -13,3 +13,7 @@ def get_position() -> int:
         int: The position of the piston in mm.
     """
     raise NotImplementedError('This function is not implemented yet.')
+
+def stop():
+    """Stops the motor."""
+    raise NotImplementedError('This function is not implemented yet.')
