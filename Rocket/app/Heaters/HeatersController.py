@@ -36,35 +36,42 @@ async def run_heaters_cycle(starting_time: float):
                 if current_temperature is None:
                     raise CustomException(
                         f'Could not get temperature data from the temperature sensor.', 
-                        ErrorCodesEnum.TEMP_SENSOR_NULL_ERROR
+                        ErrorCodesEnum.TEMP_SENSOR_NULL_ERROR,
+                        data_manager
                     )
             except CustomException as e:
                 logging.error(e)
                 
                 if consecutive_failures >= 5: # In case of 5 consecutive failures to get temperature data, raise the exception higher.
                     raise e
-                            
+                                
                 consecutive_failures += 1
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(0.3)
                 continue
             
             consecutive_failures = 0
             
             current_heaters_state = await data_manager.get_heater_status()
-            
-            if (current_temperature < TEMPERATURE_THRESHOLD) and (not current_heaters_state):
-                # TODO: Uncomment the following line when the heater driver is implemented.
-                # heater_driver.activate_heaters()
+                                    
+            if (current_temperature < TEMPERATURE_THRESHOLD):
+                if not current_heaters_state:
+                    # TODO: Uncomment the following line when the heater driver is implemented.
+                    # heater_driver.activate_heaters()
+                    pass
+                
                 await data_manager.save_heater_status(True)
-                logging.info(f'Heaters ACTIVATED. Current temperature: {current_temperature} C.')
-            elif (current_temperature >= TEMPERATURE_THRESHOLD) and (current_heaters_state):
-                # TODO: Uncomment the following line when the heater driver is implemented.
-                # heater_driver.deactivate_heaters()
+                logging.info(f'Heaters are ACTIVATED. Current temperature: {current_temperature} C.')
+            else: # current_temperature >= TEMPERATURE_THRESHOLD
+                if current_heaters_state:
+                    # TODO: Uncomment the following line when the heater driver is implemented.
+                    # heater_driver.deactivate_heaters()
+                    pass
+                
                 await data_manager.save_heater_status(False)
-                logging.info(f'Heaters DEACTIVATED. Current temperature: {current_temperature} C.')
-            else:
-                await asyncio.sleep(0.2)
+                logging.info(f'Heaters are DEACTIVATED. Current temperature: {current_temperature} C.')
     
+            await asyncio.sleep(0.3)
+            
     except CustomException as reraised_exception:
         logging.error('The sensors could not be read for 5 consecutive times (1 second). The program will stop the heaters cycle.')
         # TODO: Uncomment the following line when the heater driver is implemented.

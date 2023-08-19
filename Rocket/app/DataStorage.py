@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import aiosqlite as sql
 from utils import sql_utils as sqlu
@@ -108,7 +109,7 @@ class DataStorage:
             await sqlu.add_heater_status(cursor, heater_status)
             await db.commit()
     
-    async def save_temperature_of_sensor(self, temp: float, sensor_num: int):
+    async def _save_temperature_of_sensor(self, temp: float, sensor_num: int):
         """Adds the temperature of a specified sensor to the database.
         
         Args:
@@ -120,7 +121,7 @@ class DataStorage:
             await sqlu.add_temp_to_sensor(cursor, temp, sensor_num)
             await db.commit()
             
-    async def save_pressure_of_sensor(self, pressure: float, sensor_num: int):
+    async def _save_pressure_of_sensor(self, pressure: float, sensor_num: int):
         """Adds the pressure of a specified sensor to the database.
         
         Args:
@@ -155,6 +156,22 @@ class DataStorage:
             await sqlu.add_error_code(cursor, error_code)
             await db.commit()
             
+    async def save_sensor_data(self, temp_1: float, temp_2: float, press_1: float, press_2: float):
+        """Adds the data of the sensors to the database.
+        
+        Args:
+            temp_1 (float): The temperature of the first sensor in (Celsius?)
+            temp_2 (float): The temperature of the second sensor in (Celsius?)
+            press_1 (float): The pressure of the first sensor in (atm?)
+            press_2 (float): The pressure of the second sensor in (atm?)
+        """
+        await asyncio.gather(
+            self._save_temperature_of_sensor(temp_1, 1),
+            self._save_temperature_of_sensor(temp_2, 2),
+            self._save_pressure_of_sensor(press_1, 1),
+            self._save_pressure_of_sensor(press_2, 2),
+        )      
+    
     async def get_motor_speed(self) -> int | None:
         """Gets the speed of the motor from the database.
         
@@ -221,8 +238,7 @@ class DataStorage:
             temp = await sqlu.get_temp_of_sensor(cursor, sensor_num)
             await db.commit()
         
-        # return temp # This is commented out for debugging purposes
-        return 1.0
+        return temp
     
     async def get_pressure_of_sensor(self, sensor_num: int) -> float | None:
         """Gets the pressure of a specified sensor from the database.
@@ -238,8 +254,7 @@ class DataStorage:
             pressure = await sqlu.get_pressure_of_sensor(cursor, sensor_num)
             await db.commit()
         
-        # return pressure # This is commented out for debugging purposes
-        return 1.0
+        return pressure
     
     async def get_status_of_signal(self, signal_name: str) -> bool | None:
         """Gets the status of a specified signal from the database.

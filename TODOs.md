@@ -26,8 +26,8 @@
   - [X] HeaterController
   - [ ] SoundCardController
   - [ ] CameraController
+  - [X] Sensor Reading
   - [X] Concurrency
-- [ ] BUG: In case of fluctuations in the temperatures below and above the threshold, the heater will be turned on and off every instant of a second. This is not good for the heater and for the SW in general because it will create infinite rows in the DB. There should be a way to lower the frequency of the temperature readings by the heater.
 
 ### IPR 2 Feedback
 
