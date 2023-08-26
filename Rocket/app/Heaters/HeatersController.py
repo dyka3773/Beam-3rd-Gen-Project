@@ -27,8 +27,6 @@ async def run_heaters_cycle(starting_time: float):
     """
     consecutive_failures = 0
     
-    data_manager = await DataStorage()
-    
     try:
         while(time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.value):
             current_temperature = await get_avg_temp()
@@ -37,7 +35,7 @@ async def run_heaters_cycle(starting_time: float):
                     raise CustomException(
                         f'Could not get temperature data from the temperature sensor.', 
                         ErrorCodesEnum.TEMP_SENSOR_NULL_ERROR,
-                        data_manager
+                        DataStorage()
                     )
             except CustomException as e:
                 logging.error(e)
@@ -51,7 +49,7 @@ async def run_heaters_cycle(starting_time: float):
             
             consecutive_failures = 0
             
-            current_heaters_state = await data_manager.get_heater_status()
+            current_heaters_state = await DataStorage().get_heater_status()
                                     
             if (current_temperature < TEMPERATURE_THRESHOLD):
                 if not current_heaters_state:
@@ -59,7 +57,7 @@ async def run_heaters_cycle(starting_time: float):
                     # heater_driver.activate_heaters()
                     pass
                 
-                await data_manager.save_heater_status(True)
+                await DataStorage().save_heater_status(True)
                 logging.info(f'Heaters are ACTIVATED. Current temperature: {current_temperature} C.')
             else: # current_temperature >= TEMPERATURE_THRESHOLD
                 if current_heaters_state:
@@ -67,7 +65,7 @@ async def run_heaters_cycle(starting_time: float):
                     # heater_driver.deactivate_heaters()
                     pass
                 
-                await data_manager.save_heater_status(False)
+                await DataStorage().save_heater_status(False)
                 logging.info(f'Heaters are DEACTIVATED. Current temperature: {current_temperature} C.')
     
             await asyncio.sleep(0.3)

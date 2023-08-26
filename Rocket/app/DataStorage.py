@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import aiosqlite as sql
+import sqlite3 as sqlite
 from utils import sql_utils as sqlu
 
 logging.basicConfig(
@@ -21,21 +22,21 @@ class DataStorage:
     
     db_filename : str = 'rocket.db'
     
-    async def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         """This function is called before __init__ and is used to create a singleton class.
         
         NOTE: It also initializes the database if the class hasn't been instantiated before.
         """
         if cls._instance is None:
             cls._instance = super().__new__(cls, *args, **kwargs)
-            await cls._instance._create_db() # Create the database if it doesn't exist
+            cls._instance._create_db() # Create the database if it doesn't exist
         return cls._instance
 
-    async def _create_db(self):
+    def _create_db(self):
         """Creates the database 
         """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            await db.executescript('''
+        with sqlite.connect(self.db_filename, timeout=10) as db:
+            db.executescript('''
                     DROP TABLE IF EXISTS ROCKET_DATA;
 
                     -- TODO: Add contraints in the values of the columns where needed
@@ -61,7 +62,7 @@ class DataStorage:
                     );
                 ''')
             
-            await db.commit()
+            db.commit()
             
             logging.info('Created table ROCKET_DATA')
             
