@@ -1,5 +1,6 @@
 import base64
 
+
 def encode_image(image):
     """Encodes image to base64 string.
 
