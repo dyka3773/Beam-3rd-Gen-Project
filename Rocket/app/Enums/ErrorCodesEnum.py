@@ -1,8 +1,9 @@
 from enum import Enum
 
+
 class ErrorCodesEnum(Enum):
     """An enum to store the error codes and their messages.
-    
+
     NOTE: The error codes are stored in the database as integers.
     """
     MOTOR_SPEED_ERROR = 1
@@ -17,14 +18,14 @@ class ErrorCodesEnum(Enum):
     OVERHEAT_ERROR = 10
     OVERPRESSURE_ERROR = 11
     TEMP_SENSOR_NULL_ERROR = 12
-    
+
     @staticmethod
     def from_value(value: int):
         """Returns the error code from the given value.
-        
+
         Args:
             value (int): The value of the error code to be returned.
-            
+
         Returns:
             ErrorCode: The error code with the given value.
         """

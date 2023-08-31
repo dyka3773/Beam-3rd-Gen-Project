@@ -15,9 +15,9 @@ import u3
 
 
 # MAX_REQUESTS is the number of packets to be read.
-MAX_REQUESTS = 75 #We don't use that
+MAX_REQUESTS = 75  # We don't use that
 # SCAN_FREQUENCY is the scan frequency of stream mode in Hz
-SCAN_FREQUENCY = 5000 #TODO
+SCAN_FREQUENCY = 5000  # TODO
 
 d = None
 
@@ -39,7 +39,13 @@ d.getCalibrationData()
 d.configIO(FIOAnalog=3)
 
 print("Configuring U3 stream")
-d.streamConfig(NumChannels=2, PChannels=[0, 1], NChannels=[31, 31], Resolution=3, ScanFrequency=SCAN_FREQUENCY)
+d.streamConfig(
+    NumChannels=2,
+    PChannels=[0, 1],
+    NChannels=[31, 31],
+    Resolution=3,
+    ScanFrequency=SCAN_FREQUENCY
+)
 
 try:
     print("Start stream")
@@ -58,7 +64,8 @@ try:
             #     break
 
             if r["errors"] != 0:
-                print("Errors counted: %s ; %s" % (r["errors"], datetime.now()))
+                print("Errors counted: %s ; %s" %
+                      (r["errors"], datetime.now()))
 
             if r["numPackets"] != d.packetsPerRequest:
                 print("----- UNDERFLOW : %s ; %s" %
