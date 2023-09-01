@@ -17,7 +17,7 @@ import u3
 # MAX_REQUESTS is the number of packets to be read.
 MAX_REQUESTS = 75  # We don't use that
 # SCAN_FREQUENCY is the scan frequency of stream mode in Hz
-SCAN_FREQUENCY = 5000  # TODO
+SCAN_FREQUENCY = 48000  # TODO
 
 d = None
 
