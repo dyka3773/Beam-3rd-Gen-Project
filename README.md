@@ -94,4 +94,5 @@ Please contact us if you want to use any of the information or ideas that are us
 - Iraklis Konsoulas - [dyka3773](https://github.com/dyka3773)
 - Katerina Zachari - [sugarstreet](https://github.com/sugarstreet)
 - Chrysa Episkopou - [xrysanthemo](https://github.com/xrysanthemo)
+- Alexis Pakas - [Alex-Pak](https://github.com/Alex-Pak)
 - Maria Afentouli - [afentoulimaria](https://github.com/afentoulimaria)
