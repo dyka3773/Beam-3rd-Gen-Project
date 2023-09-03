@@ -41,4 +41,4 @@
 
 ## General SW TODOS
 
-- [ ] Setup the Jetson Nano.
+- [X] Setup the Jetson Nano.
