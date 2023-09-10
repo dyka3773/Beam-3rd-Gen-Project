@@ -1,3 +1,6 @@
+import random  # TODO: Remove this line
+
+
 def read_temp(sensor_id: int) -> float:
     """Reads the temperature from the sensor.
 
@@ -8,7 +11,7 @@ def read_temp(sensor_id: int) -> float:
         float: The temperature read from the sensor.
     """
     # TODO: Implement this function
-    return 15.0
+    return random.uniform(-50, 100)
 
 
 def read_pressure(sensor_id: int) -> float:
@@ -21,4 +24,4 @@ def read_pressure(sensor_id: int) -> float:
         float: The pressure read from the sensor.
     """
     # TODO: Implement this function
-    return 1.0
+    return random.uniform(0.5, 2)

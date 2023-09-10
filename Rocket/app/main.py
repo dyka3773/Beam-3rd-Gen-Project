@@ -1,4 +1,4 @@
-import asyncio  # NOTE: This might change eventually to the threading module
+import asyncio
 import logging
 import time
 

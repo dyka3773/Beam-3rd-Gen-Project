@@ -1,6 +1,8 @@
 import asyncio
 import logging
+from typing import Iterable
 import aiosqlite as sql
+from aiosqlite import Row
 import sqlite3 as sqlite
 from utils import sql_utils as sqlu
 
@@ -47,7 +49,8 @@ class DataStorage:
                         motor_speed INTEGER,        -- The speed of the motor in (rpm?)
                         sound_card_status INTEGER,  -- The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
                         camera_status INTEGER,      -- The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
-                        heater_status BOOLEAN,      -- The status of the heater. Possible values: 0 = OFF, 1 = ON
+                        cell_heater_status BOOLEAN,      -- The status of the cell heater. Possible values: 0 = OFF, 1 = ON
+                        electronics_heater_status BOOLEAN,      -- The status of the electronics heater. Possible values: 0 = OFF, 1 = ON
                         temp_1 REAL,                -- The temperature of the first sensor in (Celsius?)
                         temp_2 REAL,                -- The temperature of the second sensor in (Celsius?)
                         -- Add sensors here if needed
@@ -100,7 +103,7 @@ class DataStorage:
             await sqlu.add_camera_status(cursor, camera_status)
             await db.commit()
 
-    async def save_heater_status(self, heater_status: bool):
+    async def add_cell_heater_status(self, heater_status: bool):
         """Adds the status of the heater to the database.
 
         Args:
@@ -108,7 +111,18 @@ class DataStorage:
         """
         async with sql.connect(self.db_filename, timeout=10) as db:
             cursor = await db.cursor()
-            await sqlu.add_heater_status(cursor, heater_status)
+            await sqlu.add_cell_heater_status(cursor, heater_status)
+            await db.commit()
+
+    async def add_electronics_heater_status(self, heater_status: bool):
+        """Adds the status of the heater to the database.
+
+        Args:
+            heater_status (bool): The status of the heater. Possible values: 0 = OFF, 1 = ON
+        """
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_electronics_heater_status(cursor, heater_status)
             await db.commit()
 
     async def _save_temperature_of_sensor(self, temp: float, sensor_num: int):
@@ -213,7 +227,7 @@ class DataStorage:
 
         return status
 
-    async def get_heater_status(self) -> bool | None:
+    async def get_cell_heater_status(self) -> bool | None:
         """Gets the status of the heater from the database.
 
         Returns:
@@ -221,23 +235,37 @@ class DataStorage:
         """
         async with sql.connect(self.db_filename, timeout=10) as db:
             cursor = await db.cursor()
-            status = await sqlu.get_heater_status(cursor)
+            status = await sqlu.get_cell_heater_status(cursor)
             await db.commit()
 
         return status
 
-    async def get_temperature_of_sensor(self, sensor_num: int) -> float | None:
+    async def get_electronics_heater_status(self) -> bool | None:
+        """Gets the status of the heater from the database.
+
+        Returns:
+            bool: The status of the heater. Possible values: 0 = OFF, 1 = ON
+        """
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            status = await sqlu.get_electronics_heater_status(cursor)
+            await db.commit()
+
+        return status
+
+    async def get_temp_of_sensor_for_the_last_x_secs(self, sensor_num: int, secs_ago: int = 1) -> Iterable[Row] | None:
         """Gets the temperature of a specified sensor from the database.
 
         Args:
             sensor_num (int): The number of the sensor to get the temperature from.
+            secs_ago (int, optional): The number of seconds ago to get the temperature from. Defaults to 1.
 
         Returns:
             float: The temperature of the specified sensor.
         """
         async with sql.connect(self.db_filename, timeout=10) as db:
             cursor = await db.cursor()
-            temp = await sqlu.get_temp_of_sensor(cursor, sensor_num)
+            temp = await sqlu.get_temp_of_sensor_for_the_last_x_secs(cursor, sensor_num, secs_ago)
             await db.commit()
 
         return temp

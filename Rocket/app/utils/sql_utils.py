@@ -1,4 +1,6 @@
+from typing import Iterable
 import aiosqlite
+from aiosqlite import Row
 import logging
 
 logging.basicConfig(
@@ -181,17 +183,17 @@ async def add_camera_status(cursor: aiosqlite.Cursor, camera_status: int):
                 f"Updated the timestamp '{earliest_time}' with camera status: {camera_status}")
 
 
-async def add_heater_status(cursor: aiosqlite.Cursor, heater_status: bool):
+async def add_cell_heater_status(cursor: aiosqlite.Cursor, cell_heater_status: bool):
     """Adds the heater status to the database by first checking when the heater status has been added in the last second.
     If it hasn't been added in the last second, it inserts a new row with the new heater status. If it has been added in the last second,
     it updates the earliest row with the new heater status.
 
     Args:
         cursor (aiosqlite.Cursor): The cursor of the database.
-        heater_status (bool): The heater status to be added to the database.
+        cell_heater_status (bool): The heater status to be added to the database.
     """
     results = await cursor.execute("""
-                                    SELECT heater_status, time 
+                                    SELECT cell_heater_status, time 
                                     FROM rocket_data
                                     WHERE strftime('%s', time) = strftime('%s', 'now')
                                     ORDER BY time DESC
@@ -201,40 +203,98 @@ async def add_heater_status(cursor: aiosqlite.Cursor, heater_status: bool):
 
     if not results:
         await cursor.execute("""
-                                INSERT INTO rocket_data (heater_status) VALUES (?)
-                            """, (heater_status,))
-        logging.debug(f'Added a new row with heater status: {heater_status}')
+                                INSERT INTO rocket_data (cell_heater_status) VALUES (?)
+                            """, (cell_heater_status,))
+        logging.debug(
+            f'Added a new row with heater status: {cell_heater_status}')
     else:
 
         # This variable will declare the earliest time in which the heater status was None.
         earliest_time = None
 
         for row in results:
-            prev_heater_status, last_time = row
+            prev_cell_heater_status, last_time = row
 
-            if prev_heater_status is not None:
+            if prev_cell_heater_status is not None:
                 if earliest_time is not None:
                     await cursor.execute(""" 
-                                            UPDATE rocket_data SET heater_status = ? WHERE time = ?
-                                        """, (heater_status, earliest_time))
+                                            UPDATE rocket_data SET cell_heater_status = ? WHERE time = ?
+                                        """, (cell_heater_status, earliest_time))
                     logging.debug(
-                        f"Updated the timestamp '{earliest_time}' with heater status: {heater_status}")
+                        f"Updated the timestamp '{earliest_time}' with heater status: {cell_heater_status}")
                     break
                 await cursor.execute("""
-                                        INSERT INTO rocket_data (heater_status) VALUES (?)
-                                    """, (heater_status,))
+                                        INSERT INTO rocket_data (cell_heater_status) VALUES (?)
+                                    """, (cell_heater_status,))
                 logging.debug(
-                    f'Added a new row with heater status: {heater_status}')
+                    f'Added a new row with heater status: {cell_heater_status}')
                 break
             else:
                 earliest_time = last_time
                 continue
         else:
             await cursor.execute("""
-                                    UPDATE rocket_data SET heater_status = ? WHERE time = ?
-                                """, (heater_status, earliest_time))
+                                    UPDATE rocket_data SET cell_heater_status = ? WHERE time = ?
+                                """, (cell_heater_status, earliest_time))
             logging.debug(
-                f"Updated the timestamp '{earliest_time}' with heater status: {heater_status}")
+                f"Updated the timestamp '{earliest_time}' with heater status: {cell_heater_status}")
+
+
+async def add_electronics_heater_status(cursor: aiosqlite.Cursor, electronics_heater_status: bool):
+    """Adds the heater status to the database by first checking when the heater status has been added in the last second.
+    If it hasn't been added in the last second, it inserts a new row with the new heater status. If it has been added in the last second,
+    it updates the earliest row with the new heater status.
+
+    Args:
+        cursor (aiosqlite.Cursor): The cursor of the database.
+        electronics_heater_status (bool): The heater status to be added to the database.
+    """
+    results = await cursor.execute("""
+                                    SELECT electronics_heater_status, time 
+                                    FROM rocket_data
+                                    WHERE strftime('%s', time) = strftime('%s', 'now')
+                                    ORDER BY time DESC
+                                """)
+
+    results = await results.fetchall()
+
+    if not results:
+        await cursor.execute("""
+                                INSERT INTO rocket_data (electronics_heater_status) VALUES (?)
+                            """, (electronics_heater_status,))
+        logging.debug(
+            f'Added a new row with heater status: {electronics_heater_status}')
+    else:
+
+        # This variable will declare the earliest time in which the heater status was None.
+        earliest_time = None
+
+        for row in results:
+            prev_electronics_heater_status, last_time = row
+
+            if prev_electronics_heater_status is not None:
+                if earliest_time is not None:
+                    await cursor.execute(""" 
+                                            UPDATE rocket_data SET electronics_heater_status = ? WHERE time = ?
+                                        """, (electronics_heater_status, earliest_time))
+                    logging.debug(
+                        f"Updated the timestamp '{earliest_time}' with heater status: {electronics_heater_status}")
+                    break
+                await cursor.execute("""
+                                        INSERT INTO rocket_data (electronics_heater_status) VALUES (?)
+                                    """, (electronics_heater_status,))
+                logging.debug(
+                    f'Added a new row with heater status: {electronics_heater_status}')
+                break
+            else:
+                earliest_time = last_time
+                continue
+        else:
+            await cursor.execute("""
+                                    UPDATE rocket_data SET electronics_heater_status = ? WHERE time = ?
+                                """, (electronics_heater_status, earliest_time))
+            logging.debug(
+                f"Updated the timestamp '{earliest_time}' with heater status: {electronics_heater_status}")
 
 
 async def add_temp_to_sensor(cursor: aiosqlite.Cursor, temp: float, sensor_num: int):
@@ -477,7 +537,7 @@ async def get_camera_status(cursor: aiosqlite.Cursor) -> int | None:
     return status
 
 
-async def get_heater_status(cursor: aiosqlite.Cursor) -> bool | None:
+async def get_cell_heater_status(cursor: aiosqlite.Cursor) -> bool | None:
     """Returns the heater status from the database.
 
     Args:
@@ -487,9 +547,9 @@ async def get_heater_status(cursor: aiosqlite.Cursor) -> bool | None:
         bool: The heater status from the database.
     """
     results = await cursor.execute("""
-                                    SELECT heater_status
+                                    SELECT cell_heater_status
                                     FROM rocket_data
-                                    WHERE heater_status IS NOT NULL
+                                    WHERE cell_heater_status IS NOT NULL
                                     ORDER BY time DESC LIMIT 1
                                 """)
     results = await results.fetchone()
@@ -497,12 +557,33 @@ async def get_heater_status(cursor: aiosqlite.Cursor) -> bool | None:
     return status
 
 
-async def get_temp_of_sensor(cursor: aiosqlite.Cursor, sensor_num: int) -> float | None:
+async def get_electronics_heater_status(cursor: aiosqlite.Cursor) -> bool | None:
+    """Returns the heater status from the database.
+
+    Args:
+        cursor (aiosqlite.Cursor): The cursor of the database.
+
+    Returns:
+        bool: The heater status from the database.
+    """
+    results = await cursor.execute("""
+                                    SELECT electronics_heater_status
+                                    FROM rocket_data
+                                    WHERE electronics_heater_status IS NOT NULL
+                                    ORDER BY time DESC LIMIT 1
+                                """)
+    results = await results.fetchone()
+    status = bool(results[0]) if results is not None else None
+    return status
+
+
+async def get_temp_of_sensor_for_the_last_x_secs(cursor: aiosqlite.Cursor, sensor_num: int, secs_ago: int = 1) -> Iterable[Row] | None:
     """Returns the temperature of the specified sensor from the database.
 
     Args:
         cursor (aiosqlite.Cursor): The cursor of the database.
         sensor_num (int): The number of the sensor to be added to the database.
+        secs_ago (int, optional): The number of seconds ago to get the temperature from. Defaults to 1.
 
     Returns:
         float: The temperature of the specified sensor from the database.
@@ -511,11 +592,11 @@ async def get_temp_of_sensor(cursor: aiosqlite.Cursor, sensor_num: int) -> float
                                     SELECT temp_{sensor_num}
                                     FROM rocket_data
                                     WHERE temp_{sensor_num} IS NOT NULL
+                                    AND time > datetime('now', '-{secs_ago} seconds')
                                     ORDER BY time DESC
-                                    LIMIT 1
                                 """)
-    results = await results.fetchone()
-    temp = results[0] if results is not None else None
+    results = await results.fetchall()
+    temp = results if results is not None else None
     return temp
 
 
