@@ -21,6 +21,7 @@ async def run_sensors_cycle(starting_time: float):
     Args:
         starting_time (float): The time at which the program started.
     """
+    logging.info('Starting the sensors cycle.')
     while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
         temp_1 = temp_press_sensor_driver.read_temp(1)
         temp_2 = temp_press_sensor_driver.read_temp(2)
@@ -33,3 +34,5 @@ async def run_sensors_cycle(starting_time: float):
             f'Temperature 1: {temp_1} - Temperature 2: {temp_2} - Pressure 1: {press_1} - Pressure 2: {press_2}')
 
         await asyncio.sleep(0.3)
+
+    logging.info('Finished the sensors cycle.')

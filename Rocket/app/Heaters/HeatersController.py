@@ -112,6 +112,8 @@ async def run_heaters_cycle(starting_time: float):
         # heater_driver.deactivate_all_heaters()
         return
 
+    logging.info("Finished heaters cycle")
+
 
 async def test_activate_heaters(duration: int = 0):
     """Activates heaters for a specified duration of time or indefinitely.

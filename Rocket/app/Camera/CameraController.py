@@ -31,14 +31,25 @@ async def run_camera_cycle(starting_time: float):
 
     record_for = TimelineEnum.SODS_OFF.value - TimelineEnum.SODS_ON.value
 
-    # TODO: Uncomment the following line when the camera_driver#start_recording function is implemented.
+    try:
+        # TODO: Uncomment the following line when the camera_driver#start_recording function is implemented.
+        # threading.Thread(
+        #     target=start_recording,
+        #     args=(record_for,)
+        # ).start()
+        pass
+    except Exception:
+        logging.error("An Error has occured in the Camera Driver")
+        await DataStorage().save_camera_status(3)
+        return
 
-    # threading.Thread(
-    #     target=start_recording,
-    #     args=(record_for,)
-    # ).start()
+    await DataStorage().save_camera_status(2)
+    logging.info("Camera is RECORDING")
 
     while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
         await DataStorage().save_camera_status(2)
         logging.debug("Camera is RECORDING")
         await asyncio.sleep(0.3)
+
+    logging.info("Camera has STOPPED RECORDING")
+    logging.info("Finished camera cycle")

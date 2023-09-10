@@ -23,6 +23,7 @@ async def run_sound_card_cycle(starting_time: float):
         starting_time (float): The time at which the program started.
     """
     logging.info("Starting sound card cycle")
+    logging.debug("Sound card is OFF")
 
     while (time.perf_counter() - starting_time < TimelineEnum.SODS_ON.get_adapted_value):
         await DataStorage().save_sound_card_status(0)
@@ -31,12 +32,20 @@ async def run_sound_card_cycle(starting_time: float):
 
     record_for = TimelineEnum.SODS_OFF.value - TimelineEnum.SODS_ON.value
 
-    threading.Thread(
-        target=start_recording,
-        args=(record_for,)
-    ).start()
+    try:
+        start_recording(record_for)
+    except Exception:
+        logging.error("An Error has occured in the Sound Card Driver")
+        await DataStorage().save_sound_card_status(3)
+        return
+
+    await DataStorage().save_sound_card_status(2)
+    logging.info("Sound card is RECORDING")
 
     while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
         await DataStorage().save_sound_card_status(2)
         logging.debug("Sound card is RECORDING")
         await asyncio.sleep(0.3)
+
+    logging.info("Sound card has STOPPED RECORDING")
+    logging.info("Finished sound card cycle")

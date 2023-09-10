@@ -54,6 +54,8 @@ async def run_motor_cycle(starting_time: float):
         logging.debug('Motor speed is set to STOP')
         await asyncio.sleep(0.3)
 
+    logging.info("Finished motor cycle")
+
 
 async def test_run_motor(speed: int = 0):
     """Runs the motor at the specified speed after making sure that everything is working as expected.
