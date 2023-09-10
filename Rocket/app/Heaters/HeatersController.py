@@ -27,10 +27,12 @@ async def run_heaters_cycle(starting_time: float):
     Args:
         starting_time (float): The time at which the program started.
     """
+    logging.info("Starting heaters cycle")
+
     consecutive_failures = 0
 
     try:
-        while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.value):
+        while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
             current_temperature = await get_avg_temp()
             try:
                 if current_temperature is None:
@@ -62,7 +64,7 @@ async def run_heaters_cycle(starting_time: float):
 
                 await DataStorage().save_heater_status(True)
                 logging.info(
-                    f'Heaters are ACTIVATED. Current temperature: {current_temperature} C.')
+                    f'Heaters are purposely ACTIVATED. Current temperature: {current_temperature} C.')
             else:  # current_temperature >= TEMPERATURE_THRESHOLD
                 if current_heaters_state:
                     # TODO: Uncomment the following line when the heater driver is implemented.
@@ -71,11 +73,11 @@ async def run_heaters_cycle(starting_time: float):
 
                 await DataStorage().save_heater_status(False)
                 logging.info(
-                    f'Heaters are DEACTIVATED. Current temperature: {current_temperature} C.')
+                    f'Heaters are purposely DEACTIVATED. Current temperature: {current_temperature} C.')
 
             await asyncio.sleep(0.3)
 
-    except CustomException as reraised_exception:
+    except CustomException:
         logging.error(
             'The sensors could not be read for 5 consecutive times (1 second). The program will stop the heaters cycle.')
         # TODO: Uncomment the following line when the heater driver is implemented.

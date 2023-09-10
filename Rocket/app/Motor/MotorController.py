@@ -22,9 +22,12 @@ async def run_motor_cycle(starting_time: float):
     Args:
         starting_time (float): The time at which the program started.
     """
-    while (time.perf_counter() - starting_time < TimelineEnum.START_MOTOR.value):
+    logging.info("Starting motor cycle")
+    logging.info('Motor speed is set to STOP')
+
+    while (time.perf_counter() - starting_time < TimelineEnum.START_MOTOR.get_adapted_value):
         await DataStorage().save_motor_speed(MotorSpeedsEnum.STOP.value)
-        logging.info('Motor speed is set to STOP')
+        logging.debug('Motor speed is set to STOP')
         await asyncio.sleep(0.3)
 
     # TODO: Uncomment the following line when the motor_driver#run function is implemented.
@@ -34,7 +37,7 @@ async def run_motor_cycle(starting_time: float):
 
     await asyncio.sleep(0.3)
 
-    while (time.perf_counter() - starting_time < TimelineEnum.SOE_ON.value):
+    while (time.perf_counter() - starting_time < TimelineEnum.SOE_ON.get_adapted_value):
         await DataStorage().save_motor_speed(MotorSpeedsEnum.FULL_SPEED.value)
         logging.info('Motor speed is set to FULL_SPEED')
         await asyncio.sleep(0.3)
@@ -46,9 +49,9 @@ async def run_motor_cycle(starting_time: float):
 
     await asyncio.sleep(0.3)
 
-    while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.value):
+    while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
         await DataStorage().save_motor_speed(MotorSpeedsEnum.STOP.value)
-        logging.info('Motor speed is set to STOP')
+        logging.debug('Motor speed is set to STOP')
         await asyncio.sleep(0.3)
 
 

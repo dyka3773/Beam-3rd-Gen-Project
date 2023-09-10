@@ -21,7 +21,7 @@ async def run_sensors_cycle(starting_time: float):
     Args:
         starting_time (float): The time at which the program started.
     """
-    while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.value):
+    while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
         temp_1 = temp_press_sensor_driver.read_temp(1)
         temp_2 = temp_press_sensor_driver.read_temp(2)
 

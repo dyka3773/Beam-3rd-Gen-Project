@@ -13,3 +13,7 @@ class TimelineEnum(Enum):
     LIFT_OFF = 0
     START_MOTOR = 51
     START_OF_MICROGRAVITY = 71
+
+    @property
+    def get_adapted_value(self):
+        return self.value + 600
