@@ -121,6 +121,9 @@ dmypy.json
 # Visual Studio Code
 .vscode/
 
+# IntelliJ/PyCharm
+.idea/
+
 # SQLite database files
 *.sqlite3
 *.db
