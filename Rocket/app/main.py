@@ -16,6 +16,8 @@ logging.basicConfig(
     filemode='a'
 )
 
+# TODO: Install dependencies on Jetson Nano
+
 
 async def main():
 
