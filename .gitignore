@@ -127,3 +127,6 @@ dmypy.json
 # SQLite database files
 *.sqlite3
 *.db
+
+# Python wheel packages
+*.whl
