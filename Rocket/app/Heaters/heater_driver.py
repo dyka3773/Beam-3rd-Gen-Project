@@ -5,11 +5,13 @@ import Jetson.GPIO as GPIO
 ## ΣΗΜΑΝΤΙΚΟ: ΕΙΝΑΙ ΑΠΑΡΑΙΤΗΤΟ ΝΑ ΚΑΤΕΒΑΣΟΥΜΕ ΤΗ ΒΙΒΛΙΟΘΗΚΗ ΣΤΟ JETSON, ΠΡΙΝ ΤΗΝ
 ## ΧΡΗΣΙΜΟΠΟΙΗΣΟΥΜΕ ΟΠΟΤΕΔΗΠΟΤΕ, ΚΑΙ ΝΑ ΚΑΝΟΥΜΕ CONFIGURE ΤΑ PERMISSIONS!
 
-heater_1_pin = as_epileksei_to_electrical_1
-heater_2_pin = as_epileksei_to_electrical_2
-## as_epileksei_to_electrical_1 και as_epileksei_to_electrical_2 είναι τα pins (int, αν έχει
-## κάποια σημασία) (ή, αν είναι παραπάνω τα heaters (pins), τότε τα αντίστοιχα κομμάτια τού
-## driver πολλαπλασιάζονται αντιστοίχως)
+heater_1_pin = 18 
+heater_2_pin = 19
+## Οι τιμές, εδώ, είναι ενδεικτικές. Μόλις αποφασιστεί από το Electrical ποια pins
+## χρησιμοποιούνε οι heaters, τότε και οι τιμές στις μεταβλητές heater_1_pin
+## και heater_2_pin θα προσαρμοστούν αναλόγως (για τον ένα και τον άλλο heater) (ή, αν είναι
+## παραπάνω τα heaters (pins), τότε τα αντίστοιχα κομμάτια τού driver πολλαπλασιάζονται
+## αντιστοίχως).
 
 GPIO.setmode(GPIO.BCM) ## Ίσως, το συγκεκριμένο, όπως και παρακάτω είναι από τα μόνα που πρέπει
                        ## να κοιτάξουμε, αν δημιουργείται πρόβλημα, γιατί, απ' ό,τι κατάλαβα,
@@ -23,14 +25,18 @@ GPIO.setmode(GPIO.BCM) ## Ίσως, το συγκεκριμένο, όπως κα
 GPIO.setup(heater_1_pin, GPIO.OUT)
 GPIO.setup(heater_2_pin, GPIO.OUT)
 
-def activate_heaters():
-    GPIO.output(heater_1_pin, GPIO.HIGH)
-    GPIO.output(heater_2_pin, GPIO.HIGH)
+def activate_heater(heater_pin_for_activation):
+    GPIO.output(heater_pin_for_activation, GPIO.HIGH)
     ## raise NotImplementedError('This function is not implemented yet')
 
-def deactivate_heaters():
-    GPIO.output(heater_1_pin, GPIO.LOW)
-    GPIO.output(heater_2_pin, GPIO.LOW)
+def deactivate_heaters(heater_pin_for_deactivation): ## Έβαλα διαφορετικά ονόματα
+                                                     ## (heater_pin_for_activation και
+                                                     ## heater_pin_for_deactivation, πάνω και
+                                                     ## κάτω, αντίστοιχα) στις μεταβλητές των
+                                                     ## δύο functions, αν και, ξέρω, δεν παίζει
+                                                     ## κάποιο ρόλο, για να μην δημιουργούνται
+                                                     ## μπερδέματα στην ανάγνωση τού κώδικα.
+    GPIO.output(heater_pin_for_deactivation, GPIO.LOW)
     ## raise NotImplementedError('This function is not implemented yet')
 
 ## Εναλλακτικό (σαν βιβλιοθήκη που μπορεί να καλείται στο πρόγραμμα που χρειάζεται), αν θέλουμε
@@ -60,11 +66,22 @@ def deactivate_heaters():
 ## Example usage
 ##
 ## import time
+## from heater_driver import heater_1_pin, heater_2_pin as h1, h2
 ##
 ## try:
-##    activate_heaters()
-##    time.sleep(10)  # Run heater for 10 seconds
-##    deactivate_heaters()
+##    activate_heater(h1)
+##    time.sleep(10)  # Run heater 1 for 10 seconds, before activating heater 2 and
+##                    # deactivating heater 1.
+##    activate_heater(h2)
+##    deactivate_heater(h1) # Activate heater 2 and deactivate heater 1.
+##    time.sleep(20) # Run heater 2 for 20 seconds, before deactivating it also.
+##    deactivate_heater(h2) # Deactivating heater 2.
+##
+##    ## Μπορούμε να κάνουμε κι άλλες τροποποιήσεις (το ίδιο ισχύει και στο παράδειγμα με τη
+##    ## βιβλιοθήκη, παραπάνω), αν χρειάζεται, όπως να δημιουργήσουμε συναρτήσεις
+##    ## activate_heaters και deactivate_heaters, π.χ., για να έλέγξουμε τούς δύο heaters
+##    ## ταυτόχρονα (αν, για παράδειγμα, δεν μάς φτάνει η συχνότητα τού Jetson) κ.λπ., αλλά,
+##    ## απ' ό,τι καταλαβαίνω, δεν μάς χρειάζεται κάτι παραπάνω.
 ##
 ## except KeyboardInterrupt:
 ##    GPIO.cleanup()  # Cleanup GPIO on keyboard interrupt
