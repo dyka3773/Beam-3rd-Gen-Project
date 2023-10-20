@@ -39,6 +39,7 @@ def deactivate_heaters(heater_pin_for_deactivation): ## Έβαλα διαφορ�
     GPIO.output(heater_pin_for_deactivation, GPIO.LOW)
     ## raise NotImplementedError('This function is not implemented yet')
 
+
 ## Εναλλακτικό (σαν βιβλιοθήκη που μπορεί να καλείται στο πρόγραμμα που χρειάζεται), αν θέλουμε
 ## να χρησιμοποιούμε τούς heaters ξεχωριστά. Προσπάθησα... (1) Δεν ξέρω, ακριβώς, αν το έκανα
 ## σωστά. (2) Δεν ξέρω, αν χρειάζεται, οπότε (γι'αυτό έβαλα και τα comments) θα ρωτούσα και τον
@@ -47,20 +48,48 @@ def deactivate_heaters(heater_pin_for_deactivation): ## Έβαλα διαφορ�
 ## import Jetson.GPIO as GPIO
 ##
 ## class HeaterDriver:
-##    def __init__(self, heater_pin):
-##        self.heater_pin = heater_pin
-##        self.setup_heater()
+##    def __init__(self, heater_1_pin, heater_2_pin):
+##        self.heater_1_pin = heater_1_pin
+##        self.heater_2_pin = heater_2_pin
+##        self.setup_heaters()
 ##
-##    def setup_heater(self):
+##    def setup_heaters(self):
 ##        GPIO.setmode(GPIO.BCM)
-##        GPIO.setup(self.heater_pin, GPIO.OUT)
+##        GPIO.setup(self.heater_1_pin, GPIO.OUT)
+##        GPIO.setup(self.heater_2_pin, GPIO.OUT)
 ##
-##    def activate_heater(self):
-##        GPIO.output(self.heater_pin, GPIO.HIGH)
+##    def activate_heater_1(self):
+##        GPIO.output(self.heater_1_pin, GPIO.HIGH)
 ##
-##    def deactivate_heater(self):
-##        GPIO.output(self.heater_pin, GPIO.LOW)
-
+##    def activate_heater_2(self):
+##        GPIO.output(self.heater_2_pin, GPIO.HIGH)
+##
+##    def deactivate_heater_1(self):
+##        GPIO.output(self.heater_1_pin, GPIO.LOW)
+##
+##    def deactivate_heater_2(self):
+##        GPIO.output(self.heater_2_pin, GPIO.LOW)
+##
+##    Παρακάτω, για μια πιο compact χρήση τού driver. Μπορεί η επιρρέπειά του σε σφάλματα να την κάνει χειρότερη,
+##    αντί για μια πιο αναλυτική, αλλά straightforward χρήση.
+##
+##    def activate_heater(self, h):
+##        if h = self.heater_1_pin:
+##            activate_heater_1()
+##        elif h = self.heater_2_pin:  ## Ή else, εφόσον υπάρχει καλή συγγραφή τού κυρίως κώδικα (όπως εξηγώ και κάτω).
+##                                     ## (Δίνει η elif περισσότερη ασφάλεια;)
+##        ##
+##            activate_heater_2()
+##        ## Έχει νόημα να κάνουμε κάποια διαδικασία αποσφαλμάτωσης; Προσωπικά, θεωρώ, ότι εφόσον κάνουμε
+##        ## καλή εκχώρηση στο κυρίως πρόγραμμα, όπου χρειάζεται ο έλεγχος των heaters, και προσοχή σε συντακτικά,
+##        ## δεν θα είναι τόσο κρίσιμη και, έτσι, κρίσιμη η αποσφαλμάτωση. (Το ίδιο, για την αποσφαλμάτωση, ισχύει
+##        ## και παρακάτω.)
+##
+##    def deactivate_heater(self, h):
+##        if h = self.heater_1_pin:
+##            deactivate_heater_1()
+##        elif h = self.heater_2_pin:  ## Ή else (όπως και πάνω).
+##            deactivate_heater_2()
 
 
 ## Example usage
