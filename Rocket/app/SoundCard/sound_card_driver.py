@@ -30,7 +30,7 @@ def start_recording(record_for: float = 650):
         logging.debug("Configuring sound card")
         card.streamConfig(  # TODO: Look up what each of these parameters do
             NumChannels=2,
-            PChannels=[0, 1],
+            PChannels=[0, 1, 2],
             NChannels=[31, 31],
             Resolution=3,
             ScanFrequency=SCAN_FREQUENCY
@@ -82,6 +82,13 @@ def record(card: u3.U3, record_for: int = 650):
                     # Writing the input to two separate files
                     input0.write(f"{data_batch['AIN0']}")
                     input1.write(f"{data_batch['AIN1']}")
+
+                    results = card.processStreamData(data_batch['results'])
+
+                    r_aio2 = results['AIN2']
+
+                    print(f"AIN2: {r_aio2}")
+
                 else:
                     # Got no data back from our read.
                     # This only happens if your stream isn't faster than the USB read
