@@ -2,6 +2,9 @@ import serial
 from Frame import *
 
 if __name__ == "__main__":
+    # According to https://jetsonhacks.com/nvidia-jetson-nano-j41-header-pinout/
+    # we will probably connect to the RXSM through the port `/dev/ttyTHS1` which requires
+    # the GPIO pins 8 & 10
     serial_port = "/dev/ttyUSB0" #TODO which port is the port we connect to in rexus interface?
     baud_rate = 9600
     max_packet_size = 64
