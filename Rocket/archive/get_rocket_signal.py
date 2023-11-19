@@ -1,8 +1,8 @@
 import Jetson.GPIO as GPIO
 
-LO_pin=26
-SOE_pin=27
-SODS_pin=28  ## Mock values here...
+LO_pin = 26
+SOE_pin = 27
+SODS_pin = 28   ## Mock values here...
 
 GPIO.setmode(BCM)
 
@@ -11,20 +11,20 @@ GPIO.setup(SOE_pin, GPIO.IN)
 GPIO.setup(SODS_pin, GPIO.IN)
 
 def rocket_signal():
-  signal="initialising_string"
+  signal = "initialising_string"
   
-  LO_pin_state=GPIO.input(LO_pin)
-  SOE_pin_state=GPIO.input(SOE_pin)
-  SODS_pin_state=GPIO.input(SODS_pin)
+  LO_pin_state = GPIO.input(LO_pin)
+  SOE_pin_state = GPIO.input(SOE_pin)
+  SODS_pin_state = GPIO.input(SODS_pin)
 
-  if LO_pin_state==GPIO.HIGH:
-    signal="LO"
+  if LO_pin_state == GPIO.HIGH:
+    signal = "LO"
 
-  if SOE_pin_state==GPIO.HIGH:
-    signal="SOE"
+  if SOE_pin_state == GPIO.HIGH:
+    signal = "SOE"
 
-  if SODS_pin_state==GPIO.HIGH:
-    signal="SODS"
+  if SODS_pin_state == GPIO.HIGH:
+    signal = "SODS"
 
   GPIO.cleanup()  ## Don't really know how to use this method. I saw it widely used (and understood that it's useful to
                   ## re-initialise GPIO pins' states, but don't know when it's needed, dangers of leaving GPIO pins' states 
