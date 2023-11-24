@@ -47,10 +47,19 @@ class Frame:
     def isValid(self) -> bool:
         return crc(self.frame) == (0).to_bytes(2, "big")
 
-    def printf(self):
-        print(self.start1.hex() + ", " + self.start2.hex() + ", " + self.segID.hex() + ", " + self.payload.hex() + ", " + self.end1.hex() + ", " + self.end2.hex() + ", " + self.crc.hex())
+    def __str__(self):
+        print(self.start1.hex() + ", " + self.start2.hex() + ", " + self.segID.hex() + ", " +
+              self.payload.hex() + ", " + self.end1.hex() + ", " + self.end2.hex() + ", " + self.crc.hex())
 
-    def send_packet(self,max_packet_size):
+    def verify_packet_size(self, max_packet_size: int):
+        """Verify that the data length does not exceed the maximum packet size and send the data.
+
+        Args:
+            max_packet_size (int): The maximum packet size.
+
+        Returns:
+            bool: Whether the data length does not exceed the maximum packet size.
+        """
         # Ensure data length does not exceed the maximum packet size
         if len(self.frame) <= max_packet_size:
             return True
