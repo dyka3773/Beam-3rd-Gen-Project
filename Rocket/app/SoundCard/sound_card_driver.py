@@ -1,6 +1,7 @@
 import logging
 import time
 import threading
+import math
 
 import u3
 
@@ -117,5 +118,5 @@ def temp_read(card: u3.U3):
                         ## Τελευταία σημείωση: η LV έκδοση τού U3 που χρησιμοποιούμε έχει ένα voltage range 0-2,44V, οπότε θα πρέπει να έχουμε εξασφαλίσει ένα input σε αυτό το range (δε θα ήταν άσχημο, κιόλας, στα 2,44V
                         ## ακριβώς (ή πολύ κοντά, από κάτω)).
     R_measured=(V_in/V_t)*R_k ## Θα συνεχίσω τα τελευταία σχόλια, πιο μετά.
-    therm_temp=((T_0*B)/(B+T_0*ln(R_measured/R_0))-273.15)
+    therm_temp=((T_0*B)/(B+T_0*math.ln(R_measured/R_0))-273.15)
     return therm_temp
