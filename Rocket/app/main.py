@@ -4,6 +4,7 @@ import time
 
 from Motor.MotorController import run_motor_cycle
 from Heaters.HeatersController import run_heaters_cycle
+from Rocket.app.DataStorage import DataStorage
 from Sensors.SensorsController import run_sensors_cycle
 from Camera.CameraController import run_camera_cycle
 from SoundCard.SoundCardController import run_sound_card_cycle
@@ -19,8 +20,7 @@ logging.basicConfig(
 
 async def main():
 
-    # TODO: Implement a way to know if the application is running in test mode or flight mode
-    test_mode = False
+    test_mode = await DataStorage().get_mode() == 'TEST'
 
     # NOTE: This should be the same as POWER_ON during flight_mode
     time_at_start_of_program = time.perf_counter()

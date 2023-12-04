@@ -18,6 +18,7 @@ class ErrorCodesEnum(Enum):
     OVERHEAT_ERROR = 10
     OVERPRESSURE_ERROR = 11
     TEMP_SENSOR_NULL_ERROR = 12
+    CONNECTION_ERROR = 13
 
     @staticmethod
     def from_value(value: int):

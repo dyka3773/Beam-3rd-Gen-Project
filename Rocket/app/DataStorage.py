@@ -41,6 +41,7 @@ class DataStorage:
         with sqlite.connect(self.db_filename, timeout=10) as db:
             db.executescript('''
                     DROP TABLE IF EXISTS ROCKET_DATA;
+                    DROP TABLE IF EXISTS MODE;
 
                     -- TODO: Add contraints in the values of the columns where needed
 
@@ -64,6 +65,11 @@ class DataStorage:
                         error_code INTEGER,         -- The error code of the system in case of an error. Possible values: TBD
                         PRIMARY KEY (time)
                     );
+                    
+                    CREATE TABLE MODE (
+                        mode TEXT,                  -- The mode of the experiment. Possible values: TEST, FLIGHT
+                        PRIMARY KEY (mode)
+                    );                    
                 ''')
 
             db.commit()
@@ -319,7 +325,7 @@ class DataStorage:
         """Gets the first row of all the data from the database.
 
         Returns:
-            tuple: The first row of all the data from the database.
+            sql.Row: The first row of all the data from the database.
         """
         async with sql.connect(self.db_filename, timeout=10) as db:
             cursor = await db.cursor()
@@ -327,3 +333,31 @@ class DataStorage:
             await db.commit()
 
         return data
+
+    async def save_mode(self, mode: str):
+        """Adds the mode of the experiment to the database.
+
+        Args:
+            mode (str): The mode of the experiment to be added to the database.
+        """
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_mode(cursor, mode)
+            await db.commit()
+
+    async def get_mode(self) -> str:
+        """Gets the mode of the experiment from the database.
+
+        Returns:
+            str: The mode of the experiment.
+        """
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            mode = await sqlu.get_mode(cursor)
+            await db.commit()
+
+        if mode:
+            return mode
+        else:
+            await asyncio.sleep(0.1)
+            return await self.get_mode()
