@@ -47,15 +47,16 @@ d.streamConfig(
     ScanFrequency=SCAN_FREQUENCY
 )
 
+missed = 0
+dataCount = 0
+packetCount = 0
+start = datetime.now()
+
 try:
     print("Start stream")
     d.streamStart()
     start = datetime.now()
     print("Start time is %s" % start)
-
-    missed = 0
-    dataCount = 0
-    packetCount = 0
 
     with open("test.txt", 'w+') as file:
         for r in d.streamData():
@@ -77,7 +78,7 @@ try:
                     print("+++ Missed %s" % r["missed"])
 
                 # Comment out these prints and do something with r
-                #print("Average of %s AIN0, %s AIN1 readings: %s, %s" %
+                # print("Average of %s AIN0, %s AIN1 readings: %s, %s" %
                 #      (len(r["AIN0"]), len(r["AIN1"]), sum(r["AIN0"])/len(r["AIN0"]), sum(r["AIN1"])/len(r["AIN1"])))
 
                 file.write(f"{r['AIN0']}")
