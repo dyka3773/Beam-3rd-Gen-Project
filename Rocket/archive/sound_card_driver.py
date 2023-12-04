@@ -58,7 +58,7 @@ try:
     start = datetime.now()
     print("Start time is %s" % start)
 
-    with open("test.txt", 'w+') as file:
+    with open("AIO0.txt", 'w+') as input0, open("AIO1.txt", 'w+') as input1:
         for r in d.streamData():
             if r is not None:
                 # Our stop condition
@@ -81,7 +81,8 @@ try:
                 # print("Average of %s AIN0, %s AIN1 readings: %s, %s" %
                 #      (len(r["AIN0"]), len(r["AIN1"]), sum(r["AIN0"])/len(r["AIN0"]), sum(r["AIN1"])/len(r["AIN1"])))
 
-                file.write(f"{r['AIN0']}")
+                input0.write(f"{r['AIN0']}")
+                input1.write(f"{r['AIN1']}")
 
                 dataCount += 1
                 packetCount += r['numPackets']
