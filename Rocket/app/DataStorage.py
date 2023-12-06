@@ -67,14 +67,15 @@ class DataStorage:
                     );
                     
                     CREATE TABLE MODE (
+                        time DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')),
                         mode TEXT,                  -- The mode of the experiment. Possible values: TEST, FLIGHT
-                        PRIMARY KEY (mode)
+                        PRIMARY KEY (mode, time)
                     );                    
                 ''')
 
             db.commit()
 
-            logging.info('Created table ROCKET_DATA')
+            logging.info('Created table ROCKET_DATA and MODE in database')
 
     async def save_motor_speed(self, motor_speed: int):
         """Adds the speed of the motor to the database.
@@ -321,15 +322,15 @@ class DataStorage:
 
         return error_code
 
-    async def get_first_row_of_all_data(self) -> sql.Row | None:
-        """Gets the first row of all the data from the database.
+    async def get_last_row_of_all_data(self) -> sql.Row | None:
+        """Gets the last row of all the data from the database.
 
         Returns:
-            sql.Row: The first row of all the data from the database.
+            sql.Row: The last row of all the data from the database.
         """
         async with sql.connect(self.db_filename, timeout=10) as db:
             cursor = await db.cursor()
-            data = await sqlu.get_first_row_of_all_data(cursor)
+            data = await sqlu.get_last_row_of_all_data(cursor)
             await db.commit()
 
         return data

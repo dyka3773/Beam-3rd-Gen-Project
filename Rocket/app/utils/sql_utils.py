@@ -667,17 +667,17 @@ async def get_error_code(cursor: aiosqlite.Cursor) -> int | None:
     return error_code
 
 
-async def get_first_row_of_all_data(cursor: aiosqlite.Cursor) -> aiosqlite.Row | None:
-    """Returns the first row of all data from the database.
+async def get_last_row_of_all_data(cursor: aiosqlite.Cursor) -> aiosqlite.Row | None:
+    """Returns the last row of all data from the database.
 
     Args:
         cursor (aiosqlite.Cursor): The cursor of the database.
 
     Returns:
-        tuple: The first row of all data from the database.
+        tuple: The last row of all data from the database.
     """
     results = await cursor.execute("""
-                                    SELECT * FROM rocket_data ORDER BY time ASC LIMIT 1
+                                    SELECT * FROM rocket_data ORDER BY time DESC LIMIT 1
                                 """)
     results = await results.fetchone()
     return results
