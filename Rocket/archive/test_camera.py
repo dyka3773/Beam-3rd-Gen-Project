@@ -180,6 +180,8 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
                         img_name = f"img_{time.perf_counter()}_fps_{frame_rate_val:.1f}_bw_{bandwidth_val / 1000000.0:.1f}.jpg"
                         imgs_dir = "imgs"
 
+                        os.makedirs(imgs_dir, exist_ok=True)
+
                         time_when_starting_to_save_img = time.perf_counter()
 
                         # TODO: This code is blocking and causes the acquisition to only reach 3 FPS,
