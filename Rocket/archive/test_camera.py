@@ -1,57 +1,91 @@
-#!/usr/bin/env python3
-'''
-*****************************************************************************
-*
-*   Copyright (c) 2020, Pleora Technologies Inc., All rights reserved.
-*
-*****************************************************************************
-
-Shows how to use a PvStream object to acquire images from a GigE Vision or
-USB3 Vision device.
-'''
-
-import numpy as np
 import eBUS as eb
 import lib.PvSampleUtils as psu
+import logging
+import numpy as np
+import time
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s',
+    filename='rocket.log',
+    encoding='utf-8',
+    filemode='a'
+)
 
 BUFFER_COUNT = 16
 
-kb = psu.PvKb()
-
-opencv_is_available=True
+opencv_is_available = True
 try:
     # Detect if OpenCV is available
     import cv2
-    opencv_version=cv2.__version__
+    opencv_version = cv2.__version__
 except:
-    opencv_is_available=False
-    print("Warning: This sample requires python3-opencv to display a window")
+    opencv_is_available = False
+    logging.warn(
+        "Warning: This sample requires python3-opencv to display a window")
 
-def connect_to_device(connection_ID):
-    # Connect to the GigE Vision or USB3 Vision device
-    print("Connecting to device.")
+
+def connect_to_device(connection_ID: str) -> eb.PvDevice:
+    """Connect to the GigE Vision or USB3 Vision device
+
+    Args:
+        connection_ID (str): The ID of the device to connect to
+
+    Returns:
+        eb.PvDevice: The device object
+    """
+    logging.info("Connecting to device.")
     result, device = eb.PvDevice.CreateAndConnect(connection_ID)
     if device == None:
-        print(f"Unable to connect to device: {result.GetCodeString()} ({result.GetDescription()})")
+        logging.error(
+            f"Unable to connect to device: {result.GetCodeString()} ({result.GetDescription()})")
     return device
 
-def open_stream(connection_ID):
-    # Open stream to the GigE Vision or USB3 Vision device
-    print("Opening stream from device.")
+
+def open_stream(connection_ID: str) -> eb.PvStream:
+    """Open stream from the GigE Vision or USB3 Vision device
+
+    Args:
+        connection_ID (str): The ID of the device to connect to
+
+    Returns:
+        eb.PvStream: The stream object
+    """
+    logging.info("Opening stream from device.")
     result, stream = eb.PvStream.CreateAndOpen(connection_ID)
     if stream == None:
-        print(f"Unable to stream from device. {result.GetCodeString()} ({result.GetDescription()})")
+        logging.error(
+            f"Unable to stream from device. {result.GetCodeString()} ({result.GetDescription()})")
     return stream
 
-def configure_stream(device, stream):
-    # If this is a GigE Vision device, configure GigE Vision specific streaming parameters
+
+def configure_stream(device: eb.PvDevice, stream: eb.PvStream):
+    """Configure the stream from the GigE Vision or USB3 Vision device
+
+    Args:
+        device (eb.PvDevice): The device object
+        stream (eb.PvStream): The stream object
+    """
     if isinstance(device, eb.PvDeviceGEV):
         # Negotiate packet size
         device.NegotiatePacketSize()
         # Configure device streaming destination
-        device.SetStreamDestination(stream.GetLocalIPAddress(), stream.GetLocalPort())
+        device.SetStreamDestination(
+            stream.GetLocalIPAddress(),
+            stream.GetLocalPort()
+        )
 
-def configure_stream_buffers(device, stream):
+
+def configure_stream_buffers(device: eb.PvDevice, stream: eb.PvStream) -> list:
+    """Configure the stream buffers from the GigE Vision or USB3 Vision device
+
+    Args:
+        device (eb.PvDevice): The device object
+        stream (eb.PvStream): The stream object
+
+    Returns:
+        list: The list of buffers
+    """
     buffer_list = []
     # Reading payload size from device
     size = device.GetPayloadSize()
@@ -62,164 +96,152 @@ def configure_stream_buffers(device, stream):
         buffer_count = BUFFER_COUNT
 
     # Allocate buffers
-    for i in range(buffer_count):
+    for _ in range(buffer_count):
         # Create new pvbuffer object
         pvbuffer = eb.PvBuffer()
         # Have the new pvbuffer object allocate payload memory
         pvbuffer.Alloc(size)
         # Add to external list - used to eventually release the buffers
         buffer_list.append(pvbuffer)
-    
+
     # Queue all buffers in the stream
     for pvbuffer in buffer_list:
         stream.QueueBuffer(pvbuffer)
-    print(f"Created {buffer_count} buffers")
+    logging.info(f"Created {buffer_count} buffers")
     return buffer_list
 
-def acquire_images(device, stream):
+
+def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int):
+    """Acquire images from the GigE Vision or USB3 Vision device
+
+    Args:
+        device (eb.PvDevice): The device object
+        stream (eb.PvStream): The stream object
+        record_for (int): The amount of time to record for in seconds.
+    """
     # Get device parameters need to control streaming
-    device_params = device.GetParameters()
+    device_params: eb.PvGenParameterArray = device.GetParameters()
 
     # Map the GenICam AcquisitionStart and AcquisitionStop commands
-    start = device_params.Get("AcquisitionStart")
-    stop = device_params.Get("AcquisitionStop")
+    start: eb.PvGenParameter = device_params.Get("AcquisitionStart")
+    stop: eb.PvGenParameter = device_params.Get("AcquisitionStop")
 
     # Get stream parameters
-    stream_params = stream.GetParameters()
+    stream_params: eb.PvGenParameterArray = stream.GetParameters()
 
     # Map a few GenICam stream stats counters
-    frame_rate = stream_params.Get("AcquisitionRate")
-    bandwidth = stream_params[ "Bandwidth" ]
+    frame_rate: eb.PvGenParameter = stream_params.Get("AcquisitionRate")
+    bandwidth: eb.PvGenParameter = stream_params["Bandwidth"]
 
     # Enable streaming and send the AcquisitionStart command
-    print("Enabling streaming and sending AcquisitionStart command.")
+    logging.info("Enabling streaming and sending AcquisitionStart command.")
+
     device.StreamEnable()
     start.Execute()
 
-    doodle = "|\\-|-/"
-    doodle_index = 0
-    display_image = False
-    warning_issued = False
-
     # Acquire images until the user instructs us to stop.
-    print("\n<press a key to stop streaming>")
-    kb.start()
-    fourcc = cv2.VideoWriter_fourcc(*'avc1')
-    fps = 60.0
-    #out = cv2.VideoWriter('./imgs/output.mp4',fourcc, fps, (2560, 2048))
-    while not kb.is_stopping():
+    logging.info("\n<press a key to stop streaming>")
+
+    time_when_started = time.perf_counter()
+
+    while (time.perf_counter() - time_when_started < record_for):
         # Retrieve next pvbuffer
+        result: eb.PvResult
+        pvbuffer: eb.PvBuffer
+        operational_result: eb.PvResult
+
         result, pvbuffer, operational_result = stream.RetrieveBuffer(1000)
+
         if result.IsOK():
             if operational_result.IsOK():
-                #
                 # We now have a valid pvbuffer. This is where you would typically process the pvbuffer.
-                # -----------------------------------------------------------------------------------------
-                # ...
+                _, frame_rate_val = frame_rate.GetValue()
+                _, bandwidth_val = bandwidth.GetValue()
 
-                result, frame_rate_val = frame_rate.GetValue()
-                result, bandwidth_val = bandwidth.GetValue()
+                logging.info(f"BlockID: {pvbuffer.GetBlockID()}")
 
-                print(f"{doodle[doodle_index]} BlockID: {pvbuffer.GetBlockID()}", end='')
+                payload_type: eb.PvPayloadType = pvbuffer.GetPayloadType()
 
-                payload_type = pvbuffer.GetPayloadType()
+                # Only process data if the payload type is image
                 if payload_type == eb.PvPayloadTypeImage:
-                    image = pvbuffer.GetImage()
-                    image_data = image.GetDataPointer()
-                    print(f" W: {image.GetWidth()} H: {image.GetHeight()} ", end='')
-                    
+                    image: eb.PvImage = pvbuffer.GetImage()
+                    image_data: np.ndarray = image.GetDataPointer()
+                    logging.info(
+                        f" W: {image.GetWidth()} H: {image.GetHeight()}")
+
                     if opencv_is_available:
-                        if image.GetPixelType() == eb.PvPixelMono8:
-                            display_image = True
+
+                        # This should never happen, but just in case
                         if image.GetPixelType() == eb.PvPixelRGB8:
-                            image_data = cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
-                            display_image = True
+                            image_data = cv2.cvtColor(
+                                image_data, cv2.COLOR_RGB2BGR)
 
-                        if display_image:
-                            #cv2.imshow("stream",image_data)
-                            cv2.imwrite('test.jpg', image_data)
-                            #out.write(image_data)
-                        else:
-                            if not warning_issued:
-                                # display a message that video only display for Mono8 / RGB8 images
-                                print(f" ")
-                                print(f" Currently only Mono8 / RGB8 images are displayed", end='\r')
-                                print(f"")
-                                warning_issued = True
-
-                        if cv2.waitKey(1) & 0xFF != 0xFF:
-                            break
-
-                elif payload_type == eb.PvPayloadTypeChunkData:
-                    print(f" Chunk Data payload type with {pvbuffer.GetChunkCount()} chunks", end='')
-
-                elif payload_type == eb.PvPayloadTypeRawData:
-                    print(f" Raw Data with {pvbuffer.GetRawData().GetPayloadLength()} bytes", end='')
-
-                elif payload_type == eb.PvPayloadTypeMultiPart:
-                    print(f" Multi Part with {pvbuffer.GetMultiPartContainer().GetPartCount()} parts", end='')
+                        # TODO: Add a timestamp to the image name
+                        # IDEA: Also add the frame rate and bandwidth to the image name for debugging purposes
+                        img_name = f"img_{time.perf_counter()}_fps_{frame_rate_val:.1f}_bw_{bandwidth_val / 1000000.0:.1f}.jpg"
+                        cv2.imwrite(img_name, image_data)
 
                 else:
-                    print(" Payload type not supported by this sample", end='')
+                    logging.warn(
+                        " Payload type not supported by this sample")
 
-                print(f" {frame_rate_val:.1f} FPS  {bandwidth_val / 1000000.0:.1f} Mb/s     ", end='\r')
+                logging.info(
+                    f" {frame_rate_val:.1f} FPS  {bandwidth_val / 1000000.0:.1f} Mb/s")
             else:
                 # Non OK operational result
-                print(f"{doodle[ doodle_index ]} {operational_result.GetCodeString()}       ", end='\r')
+                logging.error(operational_result.GetCodeString())
             # Re-queue the pvbuffer in the stream object
             stream.QueueBuffer(pvbuffer)
 
         else:
             # Retrieve pvbuffer failure
-            print(f"{doodle[ doodle_index ]} {result.GetCodeString()}      ", end='\r')
+            logging.error(result.GetCodeString())
 
-        doodle_index = (doodle_index + 1) % 6
-        if kb.kbhit():
-            kb.getch()
-            break;
-
-    kb.stop()
     if opencv_is_available:
         cv2.destroyAllWindows()
 
     # Tell the device to stop sending images.
-    print("\nSending AcquisitionStop command to the device")
+    logging.info("Sending AcquisitionStop command to the device")
     stop.Execute()
 
     # Disable streaming on the device
-    print("Disable streaming on the controller.")
+    logging.info("Disable streaming on the controller.")
     device.StreamDisable()
 
     # Abort all buffers from the stream and dequeue
-    print("Aborting buffers still in stream")
+    logging.info("Aborting buffers still in stream")
     stream.AbortQueuedBuffers()
     while stream.GetQueuedBufferCount() > 0:
-        result, pvbuffer, lOperationalResult = stream.RetrieveBuffer()
+        result, pvbuffer, _ = stream.RetrieveBuffer()
 
-print("PvStreamSample:")
 
-connection_ID = psu.PvSelectDevice()
-if connection_ID:
-    device = connect_to_device(connection_ID)
-    if device:
-        stream = open_stream(connection_ID)
-        if stream:
-            configure_stream(device, stream)
-            buffer_list = configure_stream_buffers(device, stream)
-            acquire_images(device, stream)
-            buffer_list.clear()
-            
-            # Close the stream
-            print("Closing stream")
-            stream.Close()
-            eb.PvStream.Free(stream);    
+def start_recording(record_for: int):
+    """Starts recording video for a given amount of time.
 
-        # Disconnect the device
-        print("Disconnecting device")
-        device.Disconnect()
-        eb.PvDevice.Free(device)
+    Args:
+        record_for (int): The amount of time to record for in seconds.
+    """
+    logging.info("Starting recording")
 
-print("<press a key to exit>")
-kb.start()
-kb.getch()
-kb.stop()
+    logging.info("PvStreamSample:")
+
+    connection_ID: str = psu.PvSelectDevice()
+    if connection_ID:
+        device = connect_to_device(connection_ID)
+        if device:
+            stream = open_stream(connection_ID)
+            if stream:
+                configure_stream(device, stream)
+                buffer_list = configure_stream_buffers(device, stream)
+                acquire_images_for(device, stream, record_for)
+                buffer_list.clear()
+
+                # Close the stream
+                logging.info("Closing stream")
+                stream.Close()
+                eb.PvStream.Free(stream)
+
+            # Disconnect the device
+            logging.info("Disconnecting device")
+            device.Disconnect()
+            eb.PvDevice.Free(device)
