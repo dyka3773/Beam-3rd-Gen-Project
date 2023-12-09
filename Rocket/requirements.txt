@@ -1,6 +1,8 @@
 aiosqlite==0.19.0
+# ebus-python
 LabJackPython==2.1.0
 numpy==1.25.2
+opencv-python==4.8.1.78
 pyserial==3.5
 pyserial-asyncio==0.6
 Jetson.GPIO==2.1.4
