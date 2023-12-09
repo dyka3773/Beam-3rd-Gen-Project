@@ -129,3 +129,6 @@ dmypy.json
 
 # Python wheel packages
 *.whl
+
+# Images acquired by the camera
+img_*_fps_*_bw_*.jpg

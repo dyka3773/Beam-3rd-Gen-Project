@@ -4,6 +4,7 @@ import logging
 import numpy as np
 import time
 import os
+from datetime import datetime
 
 logging.basicConfig(
     level=logging.INFO,
@@ -177,7 +178,9 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
                             image_data = cv2.cvtColor(
                                 image_data, cv2.COLOR_RGB2BGR)
 
-                        img_name = f"img_{time.perf_counter()}_fps_{frame_rate_val:.1f}_bw_{bandwidth_val / 1000000.0:.1f}.jpg"
+                        curr_timestamp_in_millis: int = int(
+                            round(datetime.now().timestamp()*1000))
+                        img_name = f"img_{curr_timestamp_in_millis}_fps_{frame_rate_val:.1f}_bw_{bandwidth_val / 1000000.0:.1f}.jpg"
                         imgs_dir = "imgs"
 
                         os.makedirs(imgs_dir, exist_ok=True)
