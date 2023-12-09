@@ -4,9 +4,11 @@ import time
 
 from Motor.MotorController import run_motor_cycle
 from Heaters.HeatersController import run_heaters_cycle
+from DataStorage import DataStorage
 from Sensors.SensorsController import run_sensors_cycle
 from Camera.CameraController import run_camera_cycle
 from SoundCard.SoundCardController import run_sound_card_cycle
+from Telecoms.CommunicationsController import run_telecoms_cycle
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,12 +20,14 @@ logging.basicConfig(
 
 
 async def main():
-
-    # TODO: Implement a way to know if the application is running in test mode or flight mode
-    test_mode = False
-
     # NOTE: This should be the same as POWER_ON during flight_mode
     time_at_start_of_program = time.perf_counter()
+
+    telecoms_task = asyncio.create_task(run_telecoms_cycle())
+
+    # Make sure the telecoms cycle has started and we have received the mode from the ground station
+    await asyncio.sleep(2)
+    test_mode = await DataStorage().get_mode() == 'TEST'
 
     if test_mode:
         logging.info('''
@@ -32,7 +36,11 @@ async def main():
         ========================================''')
 
         await asyncio.gather(
-            # TODO: Add the tasks that should be run in test mode
+            # run_sensors_cycle(time_at_start_of_program),
+            run_sound_card_cycle(time_at_start_of_program),
+            run_camera_cycle(time_at_start_of_program),
+            run_heaters_cycle(time_at_start_of_program),
+            # The only thing that is not run in test mode is the motor
         )
     else:
         logging.info('''
@@ -41,13 +49,14 @@ async def main():
         ========================================''')
 
         await asyncio.gather(
-            # TODO: Complete the tasks that should be run in flight mode
-            run_sensors_cycle(time_at_start_of_program),
+            # run_sensors_cycle(time_at_start_of_program),
             run_sound_card_cycle(time_at_start_of_program),
             run_camera_cycle(time_at_start_of_program),
             run_heaters_cycle(time_at_start_of_program),
             run_motor_cycle(time_at_start_of_program),
         )
+
+    telecoms_task.cancel()
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ from Enums.TimelineEnum import TimelineEnum
 from DataStorage import DataStorage
 from ErrorHandling.CustomException import CustomException
 from Enums.ErrorCodesEnum import ErrorCodesEnum
-from Heaters import heater_driver
+# from Heaters import heater_driver
 from utils.data_handling_utils import get_avg_temp_of_sensors
 
 logging.basicConfig(
@@ -113,12 +113,3 @@ async def run_heaters_cycle(starting_time: float):
         return
 
     logging.info("Finished heaters cycle")
-
-
-async def test_activate_heaters(duration: int = 0):
-    """Activates heaters for a specified duration of time or indefinitely.
-
-    Args:
-        duration (int, optional): Duration of time to activate heaters for. To activate heaters indefinitely, set duration to 0. Defaults to 0.
-    """
-    raise NotImplementedError('This function has not been implemented yet.')

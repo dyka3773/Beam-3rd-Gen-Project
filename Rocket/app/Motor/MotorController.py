@@ -55,13 +55,3 @@ async def run_motor_cycle(starting_time: float):
         await asyncio.sleep(0.3)
 
     logging.info("Finished motor cycle")
-
-
-async def test_run_motor(speed: int = 0):
-    """Runs the motor at the specified speed after making sure that everything is working as expected.
-    In case no value is given, the motor perform one cycle and stop
-
-    Args:
-        speed (int): The speed at which the motor should run. Defaults to 0.
-    """
-    raise NotImplementedError('This function is not implemented yet.')

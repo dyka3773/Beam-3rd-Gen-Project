@@ -667,17 +667,47 @@ async def get_error_code(cursor: aiosqlite.Cursor) -> int | None:
     return error_code
 
 
-async def get_first_row_of_all_data(cursor: aiosqlite.Cursor) -> aiosqlite.Row | None:
-    """Returns the first row of all data from the database.
+async def get_last_row_of_all_data(cursor: aiosqlite.Cursor) -> aiosqlite.Row | None:
+    """Returns the last row of all data from the database.
 
     Args:
         cursor (aiosqlite.Cursor): The cursor of the database.
 
     Returns:
-        tuple: The first row of all data from the database.
+        tuple: The last row of all data from the database.
     """
     results = await cursor.execute("""
-                                    SELECT * FROM rocket_data ORDER BY time ASC LIMIT 1
+                                    SELECT * FROM rocket_data ORDER BY time DESC LIMIT 1
                                 """)
     results = await results.fetchone()
     return results
+
+
+async def add_mode(cursor: aiosqlite.Cursor, mode: str):
+    """Adds the mode to the database.
+
+    Args:
+        cursor (aiosqlite.Cursor): The cursor of the database.
+        mode (str): The mode to be added to the database.
+    """
+    await cursor.execute("""
+                            INSERT INTO mode (mode) VALUES (?)
+                        """, (mode,))
+    logging.debug(f'Added a new row with mode: {mode}')
+
+
+async def get_mode(cursor: aiosqlite.Cursor) -> str | None:
+    """Returns the mode from the database.
+
+    Args:
+        cursor (aiosqlite.Cursor): The cursor of the database.
+
+    Returns:
+        str: The mode from the database.
+    """
+    results = await cursor.execute("""
+                                    SELECT mode FROM mode ORDER BY time DESC LIMIT 1
+                                """)
+    results = await results.fetchone()
+    mode = results[0] if results is not None else None
+    return mode
