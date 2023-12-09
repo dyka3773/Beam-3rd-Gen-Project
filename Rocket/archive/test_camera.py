@@ -3,6 +3,7 @@ import lib.PvSampleUtils as psu
 import logging
 import numpy as np
 import time
+import os
 
 logging.basicConfig(
     level=logging.INFO,
@@ -176,15 +177,23 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
                             image_data = cv2.cvtColor(
                                 image_data, cv2.COLOR_RGB2BGR)
 
-                        # TODO: Add a timestamp to the image name
-                        # IDEA: Also add the frame rate and bandwidth to the image name for debugging purposes
                         img_name = f"img_{time.perf_counter()}_fps_{frame_rate_val:.1f}_bw_{bandwidth_val / 1000000.0:.1f}.jpg"
+                        imgs_dir = "imgs"
 
                         time_when_starting_to_save_img = time.perf_counter()
-                        cv2.imwrite(img_name, image_data)
+
+                        # TODO: This code is blocking and causes the acquisition to only reach 3 FPS,
+                        # we should make it async or implement a producer-consumer pattern
+                        # see also:
+                        #    https://github.com/alliedvision/VimbaPython/issues/62
+                        cv2.imwrite(
+                            os.path.join(imgs_dir, img_name),
+                            image_data
+                        )
+
                         time_when_img_saved = time.perf_counter()
 
-                        print(
+                        logging.debug(
                             f"Time to save image: {time_when_img_saved - time_when_starting_to_save_img}")
 
                 else:
