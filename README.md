@@ -21,7 +21,7 @@ This is the repository of our project, where we will upload all the files that w
   - [SED Stuff](#sed-stuff)
 - [Contributing](#contributing)
 - [License](#license)
-- [Authors](#authors)
+- [Contributors](#contributors)
 
 
 ## Getting Started
@@ -89,10 +89,11 @@ This project is Unlicensed but some of the information and ideas that are used i
 Please contact us if you want to use any of the information or ideas that are used in this project.
 
 
-## Authors
+## Contributors
 
 - Iraklis Konsoulas - [dyka3773](https://github.com/dyka3773)
 - Katerina Zachari - [sugarstreet](https://github.com/sugarstreet)
 - Chrysa Episkopou - [xrysanthemo](https://github.com/xrysanthemo)
 - Alexis Pakas - [Alex-Pak](https://github.com/Alex-Pak)
 - Maria Afentouli - [afentoulimaria](https://github.com/afentoulimaria)
+- Ilias Myserlis - [Louismys](https://github.com/Louismys)
