@@ -5,7 +5,6 @@ import time
 from Motor.MotorController import run_motor_cycle
 from Heaters.HeatersController import run_heaters_cycle
 from DataStorage import DataStorage
-from Sensors.SensorsController import run_sensors_cycle
 from Camera.CameraController import run_camera_cycle
 from SoundCard.SoundCardController import run_sound_card_cycle
 from Telecoms.CommunicationsController import run_telecoms_cycle
