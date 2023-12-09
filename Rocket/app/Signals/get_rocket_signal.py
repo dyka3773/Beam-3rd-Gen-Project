@@ -1,8 +1,9 @@
 import Jetson.GPIO as GPIO
+from Rocket.app.Enums.PinsEnum import PinsEnum
 
-LO_pin = 26
-SOE_pin = 27
-SODS_pin = 28  # Mock values here...
+LO_pin = PinsEnum.LO.value
+SOE_pin = PinsEnum.SOE.value
+SODS_pin = PinsEnum.SODS.value
 
 GPIO.setmode(GPIO.BCM)
 
