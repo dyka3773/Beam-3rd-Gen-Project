@@ -106,7 +106,7 @@ def acquire_images(device, stream):
     kb.start()
     fourcc = cv2.VideoWriter_fourcc(*'avc1')
     fps = 60.0
-    out = cv2.VideoWriter('./imgs/output.mp4',fourcc, fps, (2560, 2048))
+    #out = cv2.VideoWriter('./imgs/output.mp4',fourcc, fps, (2560, 2048))
     while not kb.is_stopping():
         # Retrieve next pvbuffer
         result, pvbuffer, operational_result = stream.RetrieveBuffer(1000)
@@ -137,8 +137,8 @@ def acquire_images(device, stream):
 
                         if display_image:
                             #cv2.imshow("stream",image_data)
-                            #cv2.imwrite('test.jpg', image_data)
-                            out.write(image_data)
+                            cv2.imwrite('test.jpg', image_data)
+                            #out.write(image_data)
                         else:
                             if not warning_issued:
                                 # display a message that video only display for Mono8 / RGB8 images
