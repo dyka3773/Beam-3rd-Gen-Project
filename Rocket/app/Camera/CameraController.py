@@ -29,15 +29,15 @@ async def run_camera_cycle(starting_time: float):
         logging.debug("Camera is OFF")
         await asyncio.sleep(0.3)
 
+    # NOTE: With the current fps reach this will use about 1.1GB of storage
+    #       This means that we can perform the full experiment cycle about 80 times before running out of storage
     record_for = TimelineEnum.SODS_OFF.value - TimelineEnum.SODS_ON.value
 
     try:
-        # TODO: Uncomment the following line when the camera_driver#start_recording function is implemented.
-        # threading.Thread(
-        #     target=start_recording,
-        #     args=(record_for,)
-        # ).start()
-        pass
+        threading.Thread(
+            target=start_recording,
+            args=(record_for,)
+        ).start()
     except Exception:
         logging.error("An Error has occured in the Camera Driver")
         await DataStorage().save_camera_status(3)
