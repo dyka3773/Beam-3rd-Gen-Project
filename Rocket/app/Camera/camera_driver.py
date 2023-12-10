@@ -20,11 +20,12 @@ opencv_is_available = True
 try:
     # Detect if OpenCV is available
     import cv2
-    opencv_version = cv2.__version__
+    opencv_version = cv2.__version__  # type: ignore
 except:
     opencv_is_available = False
     logging.warn(
         "Warning: This sample requires python3-opencv to display a window")
+    raise ImportError("python3-opencv is not installed")
 
 
 def connect_to_device(connection_ID: str) -> eb.PvDevice:
@@ -73,8 +74,8 @@ def configure_stream(device: eb.PvDevice, stream: eb.PvStream):
         device.NegotiatePacketSize()
         # Configure device streaming destination
         device.SetStreamDestination(
-            stream.GetLocalIPAddress(),
-            stream.GetLocalPort()
+            stream.GetLocalIPAddress(),  # type: ignore
+            stream.GetLocalPort()  # type: ignore
         )
 
 
@@ -139,7 +140,7 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
     logging.info("Enabling streaming and sending AcquisitionStart command.")
 
     device.StreamEnable()
-    start.Execute()
+    start.Execute()  # type: ignore
 
     # Acquire images until the user instructs us to stop.
     logging.info("\n<press a key to stop streaming>")
@@ -157,8 +158,8 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
         if result.IsOK():
             if operational_result.IsOK():
                 # We now have a valid pvbuffer. This is where you would typically process the pvbuffer.
-                _, frame_rate_val = frame_rate.GetValue()
-                _, bandwidth_val = bandwidth.GetValue()
+                _, frame_rate_val = frame_rate.GetValue()  # type: ignore
+                _, bandwidth_val = bandwidth.GetValue()  # type: ignore
 
                 logging.info(f"BlockID: {pvbuffer.GetBlockID()}")
 
@@ -218,7 +219,7 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
 
     # Tell the device to stop sending images.
     logging.info("Sending AcquisitionStop command to the device")
-    stop.Execute()
+    stop.Execute()  # type: ignore
 
     # Disable streaming on the device
     logging.info("Disable streaming on the controller.")

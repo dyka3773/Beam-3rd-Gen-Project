@@ -43,9 +43,6 @@ async def run_camera_cycle(starting_time: float):
         await DataStorage().save_camera_status(3)
         return
 
-    await DataStorage().save_camera_status(2)
-    logging.info("Camera is RECORDING")
-
     while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
         await DataStorage().save_camera_status(2)
         logging.debug("Camera is RECORDING")
