@@ -18,12 +18,12 @@ try:
         # Toggle the GPIO pin high (3.3V)
         GPIO.output(gpio_pin, GPIO.HIGH)
         time.sleep(2.5 / frequency)
-	print("GPIO.HIGH\n")
+        print("GPIO.HIGH\n")
 
         # Toggle the GPIO pin low (0V)
         GPIO.output(gpio_pin, GPIO.LOW)
         time.sleep(2.5 / frequency)
-	print("GPIO.LOW\n")
+        print("GPIO.LOW\n")
 
 except KeyboardInterrupt:
     pass
@@ -31,4 +31,3 @@ except KeyboardInterrupt:
 # Cleanup and release resources
 GPIO.cleanup()
 print("cleanup")
-
