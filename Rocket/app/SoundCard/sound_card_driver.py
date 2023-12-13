@@ -28,31 +28,14 @@ def start_recording(card: u3.U3, record_for: float = 650):
 
             file.write("AIN0, AIN1\n")
 
-            for data_batch in card.streamData():
+            while True:
 
                 # The stream will stop only if we have surpassed the record_for time
                 if time.perf_counter() - start > record_for:
                     break
 
-                if data_batch is not None:
-                    if data_batch["errors"] != 0:
-                        logging.debug(
-                            f"Errors counted: {data_batch['errors']} ; {time.perf_counter()}")
+                file.write(f"{card.getAIN(0)}, {card.getAIN(1)}\n")
 
-                    if data_batch["numPackets"] != card.packetsPerRequest:
-                        logging.warn(
-                            f"----- UNDERFLOW : {data_batch['numPackets']} ; {time.perf_counter()}")
-
-                    if data_batch["missed"] != 0:
-                        logging.warn(f"+++ Missed {data_batch['missed']}")
-
-                    file.write(f"{data_batch['AIN0']}, {data_batch['AIN1']}\n")
-
-                else:
-                    # Got no data back from our read.
-                    # This only happens if your stream isn't faster than the USB read
-                    # timeout, ~1 sec.
-                    logging.debug(f"No data ; {time.perf_counter()}")
     except Exception as e:
         logging.error("Error while recording from sound card")
         logging.error(e)

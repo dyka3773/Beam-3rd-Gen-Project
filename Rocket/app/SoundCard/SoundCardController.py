@@ -50,14 +50,13 @@ async def run_sound_card_cycle(starting_time: float):
         )
 
         card.streamConfig(  # TODO: Look up what each of these parameters do
-            NumChannels=2,
+            NumChannels=4,
             PChannels=[0, 1, 2, 3],
             NChannels=[31, 31, 31, 31],
             Resolution=3,
             ScanFrequency=SCAN_FREQUENCY
         )
 
-        card.streamStart()
     except Exception as e:
         logging.error("An Error has occured in the Sound Card Driver")
         logging.error(e)
@@ -66,7 +65,7 @@ async def run_sound_card_cycle(starting_time: float):
 
     while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
 
-        temperature_of_card = card.getTemperature()
+        temperature_of_card = card.getTemperature() - 273.15
 
         # FIXME: This is voltage and it needs to be converted to temperature by using the utils.thermistor_util
         temperature_of_thermistor1 = card.getAIN(2)
@@ -85,7 +84,7 @@ async def run_sound_card_cycle(starting_time: float):
 
             threading.Thread(  # TODO: Configure this
                 target=start_recording,
-                args=(record_for, card),
+                args=(card, record_for),
                 daemon=True
             ).start()
 
@@ -94,8 +93,8 @@ async def run_sound_card_cycle(starting_time: float):
             await DataStorage().save_sound_card_status(1)
             logging.info("I-VED is OFF")
 
-        motor_status = await DataStorage().get_motor_speed()
-        if time.perf_counter() - starting_time > TimelineEnum.START_MOTOR.get_adapted_value and motor_status != MotorSpeedsEnum.FULL_SPEED.value:
+        motor_has_been_activated_before = await DataStorage().motor_has_been_activated_before()
+        if time.perf_counter() - starting_time > TimelineEnum.START_MOTOR.get_adapted_value and not motor_has_been_activated_before:
             await DataStorage().save_motor_speed(MotorSpeedsEnum.FULL_SPEED.value)
 
             run_motor_for = TimelineEnum.SOE_OFF.value - TimelineEnum.START_MOTOR.value
@@ -117,5 +116,4 @@ async def run_sound_card_cycle(starting_time: float):
     logging.info("Finished sound card cycle")
 
     logging.info("Stopping the stream...")
-    card.streamStop()
     card.close()

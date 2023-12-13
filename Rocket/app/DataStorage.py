@@ -63,7 +63,7 @@ class DataStorage:
 
             db.commit()
 
-            logging.info('Created table ROCKET_DATA and MODE in database')
+            logging.info('Created table ROCKET_DATA in database')
 
     async def save_motor_speed(self, motor_speed: int):
         """Adds the speed of the motor to the database.
@@ -159,6 +159,18 @@ class DataStorage:
             await db.commit()
 
         return speed
+
+    async def motor_has_been_activated_before(self) -> bool:
+        """Checks if the motor has been activated before.
+
+        Returns:
+            bool: True if the motor has been activated before, False otherwise.
+        """
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            status = await sqlu.motor_has_been_activated_before(cursor)
+
+        return status
 
     async def get_sound_card_status(self) -> int | None:
         """Gets the status of the sound card from the database.

@@ -520,6 +520,22 @@ async def get_sound_card_status(cursor: aiosqlite.Cursor) -> int | None:
     return status
 
 
+async def motor_has_been_activated_before(cursor: aiosqlite.Cursor) -> bool:
+    """Returns True if the motor has been activated before, False otherwise.
+
+    Args:
+        cursor (aiosqlite.Cursor): The cursor of the database.
+
+    Returns:
+        bool: True if the motor has been activated before, False otherwise.
+    """
+    results = await cursor.execute("""
+                                   SELECT motor_speed FROM rocket_data WHERE motor_speed <> 0
+                                """)
+    results = await results.fetchall()
+    return True if results else False
+
+
 async def get_temp_of_sensor_for_the_last_x_secs(cursor: aiosqlite.Cursor, sensor_num: int, secs_ago: int = 1) -> Iterable[Row] | None:
     """Returns the temperature of the specified sensor from the database.
 
