@@ -1,10 +1,12 @@
 import platform
 import asyncio
 import logging
+import time
 from serial_asyncio import open_serial_connection
 
 from DataStorage import DataStorage
 from Enums.ErrorCodesEnum import ErrorCodesEnum
+from Enums.TimelineEnum import TimelineEnum
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,12 +24,14 @@ else:
     port = "/dev/ttyTHS1"
     logging.info(f"Running on Jetson Nano and using {port}")
 
-baud_rate = 9600
 
+async def run_telecoms_cycle(starting_time: float):
+    """Send and receive data from the serial port.
 
-async def run_telecoms_cycle():
-    """Send and receive data from the serial port."""
-    reader, writer = await open_serial_connection(url=port, baudrate=baud_rate)
+    Args:
+        starting_time(float): The time at the start of the program.
+    """
+    _, writer = await open_serial_connection(url=port, baudrate=38400)
 
     try:
         while True:
@@ -39,16 +43,11 @@ async def run_telecoms_cycle():
 
             await writer.drain()
 
-            await asyncio.sleep(0.166)
+            await asyncio.sleep(0.3)  # 3 times per second
 
-            # Read whether the experiment should run on TEST or FLIGHT mode
-            # TODO: In case we have more time, we could also receive commands from the serial port
-            mode = await reader.readline()  # This is blocking in case there is no data to read
-            mode = str(mode, 'utf-8').rstrip()
-
-            if mode:
-                logging.info(f"Received data: {mode}")
-                await DataStorage().save_mode(mode)
+            if time.perf_counter() - starting_time > TimelineEnum.SODS_OFF.get_adapted_value:
+                logging.info("Stopping the telecoms cycle...")
+                break
 
     except Exception as e:
         logging.error(f"Error in telecoms cycle: {e}")

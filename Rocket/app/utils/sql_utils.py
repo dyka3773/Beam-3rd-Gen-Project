@@ -520,63 +520,6 @@ async def get_sound_card_status(cursor: aiosqlite.Cursor) -> int | None:
     return status
 
 
-async def get_camera_status(cursor: aiosqlite.Cursor) -> int | None:
-    """Returns the camera status from the database.
-
-    Args:
-        cursor (aiosqlite.Cursor): The cursor of the database.
-
-    Returns:
-        int: The camera status from the database.
-    """
-    results = await cursor.execute("""
-                                    SELECT camera_status FROM rocket_data ORDER BY time DESC LIMIT 1
-                                """)
-    results = await results.fetchone()
-    status = results[0] if results is not None else None
-    return status
-
-
-async def get_cell_heater_status(cursor: aiosqlite.Cursor) -> bool | None:
-    """Returns the heater status from the database.
-
-    Args:
-        cursor (aiosqlite.Cursor): The cursor of the database.
-
-    Returns:
-        bool: The heater status from the database.
-    """
-    results = await cursor.execute("""
-                                    SELECT cell_heater_status
-                                    FROM rocket_data
-                                    WHERE cell_heater_status IS NOT NULL
-                                    ORDER BY time DESC LIMIT 1
-                                """)
-    results = await results.fetchone()
-    status = bool(results[0]) if results is not None else None
-    return status
-
-
-async def get_electronics_heater_status(cursor: aiosqlite.Cursor) -> bool | None:
-    """Returns the heater status from the database.
-
-    Args:
-        cursor (aiosqlite.Cursor): The cursor of the database.
-
-    Returns:
-        bool: The heater status from the database.
-    """
-    results = await cursor.execute("""
-                                    SELECT electronics_heater_status
-                                    FROM rocket_data
-                                    WHERE electronics_heater_status IS NOT NULL
-                                    ORDER BY time DESC LIMIT 1
-                                """)
-    results = await results.fetchone()
-    status = bool(results[0]) if results is not None else None
-    return status
-
-
 async def get_temp_of_sensor_for_the_last_x_secs(cursor: aiosqlite.Cursor, sensor_num: int, secs_ago: int = 1) -> Iterable[Row] | None:
     """Returns the temperature of the specified sensor from the database.
 
@@ -598,56 +541,6 @@ async def get_temp_of_sensor_for_the_last_x_secs(cursor: aiosqlite.Cursor, senso
     results = await results.fetchall()
     temp = results if results is not None else None
     return temp
-
-
-async def get_pressure_of_sensor(cursor: aiosqlite.Cursor, sensor_num: int) -> float | None:
-    """Returns the pressure of the specified sensor from the database.
-
-    Args:
-        cursor (aiosqlite.Cursor): The cursor of the database.
-        sensor_num (int): The number of the sensor to be added to the database.
-
-    Returns:
-        float: The pressure of the specified sensor from the database.
-    """
-    results = await cursor.execute(f"""
-                                    SELECT pressure_{sensor_num}
-                                    FROM rocket_data
-                                    WHERE pressure_{sensor_num} IS NOT NULL
-                                    ORDER BY time DESC
-                                    LIMIT 1
-                                """)
-    results = await results.fetchone()
-
-    pressure = results[0] if results is not None else None
-    return pressure
-
-
-async def get_status_of_signal(cursor: aiosqlite.Cursor, signal_name: str) -> bool | None:
-    """Returns the status of the specified signal from the database.
-
-    Args:
-        cursor (aiosqlite.Cursor): The cursor of the database.
-        signal_name (str): The name of the signal to be added to the database. Accepted values: LO, SOE, SODS, PO
-
-    Returns:
-        bool: The status of the specified signal from the database.
-    """
-
-    if signal_name not in accepted_signal_names:
-        raise ValueError(
-            f'Invalid signal name. Accepted values: {accepted_signal_names}')
-
-    results = await cursor.execute(f"""
-                                    SELECT {signal_name}_signal, time
-                                    FROM rocket_data
-                                    WHERE {signal_name}_signal IS NOT NULL
-                                    ORDER BY time DESC
-                                    LIMIT 1
-                                """)
-    results = await results.fetchone()
-
-    return bool(results[0]) if results is not None else None
 
 
 async def get_error_code(cursor: aiosqlite.Cursor) -> int | None:
@@ -681,33 +574,3 @@ async def get_last_row_of_all_data(cursor: aiosqlite.Cursor) -> aiosqlite.Row | 
                                 """)
     results = await results.fetchone()
     return results
-
-
-async def add_mode(cursor: aiosqlite.Cursor, mode: str):
-    """Adds the mode to the database.
-
-    Args:
-        cursor (aiosqlite.Cursor): The cursor of the database.
-        mode (str): The mode to be added to the database.
-    """
-    await cursor.execute("""
-                            INSERT INTO mode (mode) VALUES (?)
-                        """, (mode,))
-    logging.debug(f'Added a new row with mode: {mode}')
-
-
-async def get_mode(cursor: aiosqlite.Cursor) -> str | None:
-    """Returns the mode from the database.
-
-    Args:
-        cursor (aiosqlite.Cursor): The cursor of the database.
-
-    Returns:
-        str: The mode from the database.
-    """
-    results = await cursor.execute("""
-                                    SELECT mode FROM mode ORDER BY time DESC LIMIT 1
-                                """)
-    results = await results.fetchone()
-    mode = results[0] if results is not None else None
-    return mode

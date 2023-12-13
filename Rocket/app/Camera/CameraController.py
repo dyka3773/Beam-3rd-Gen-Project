@@ -36,7 +36,8 @@ async def run_camera_cycle(starting_time: float):
     try:
         threading.Thread(
             target=start_recording,
-            args=(record_for,)
+            args=(record_for,),
+            daemon=True
         ).start()
     except Exception:
         logging.error("An Error has occured in the Camera Driver")

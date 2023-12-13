@@ -1,10 +1,11 @@
 import eBUS as eb
-import lib.PvSampleUtils as psu
 import logging
 import numpy as np
 import time
 import os
 from datetime import datetime
+
+import Camera.lib.PvSampleUtils as psu
 
 logging.basicConfig(
     level=logging.INFO,
@@ -142,9 +143,6 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
     device.StreamEnable()
     start.Execute()  # type: ignore
 
-    # Acquire images until the user instructs us to stop.
-    logging.info("\n<press a key to stop streaming>")
-
     time_when_started = time.perf_counter()
 
     while (time.perf_counter() - time_when_started < record_for):
@@ -161,7 +159,7 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
                 _, frame_rate_val = frame_rate.GetValue()  # type: ignore
                 _, bandwidth_val = bandwidth.GetValue()  # type: ignore
 
-                logging.info(f"BlockID: {pvbuffer.GetBlockID()}")
+                logging.debug(f"BlockID: {pvbuffer.GetBlockID()}")
 
                 payload_type: eb.PvPayloadType = pvbuffer.GetPayloadType()
 
@@ -169,7 +167,7 @@ def acquire_images_for(device: eb.PvDevice, stream: eb.PvStream, record_for: int
                 if payload_type == eb.PvPayloadTypeImage:
                     image: eb.PvImage = pvbuffer.GetImage()
                     image_data: np.ndarray = image.GetDataPointer()
-                    logging.info(
+                    logging.debug(
                         f" W: {image.GetWidth()} H: {image.GetHeight()}")
 
                     if opencv_is_available:

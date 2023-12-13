@@ -2,10 +2,13 @@ import asyncio
 import time
 import logging
 import threading
+from u3 import U3
 
 from Enums.TimelineEnum import TimelineEnum
 from DataStorage import DataStorage
+from SoundCard.motor_driver import run_motor_cycle
 from SoundCard.sound_card_driver import start_recording
+from Enums.MotorSpeedsEnum import MotorSpeedsEnum
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,37 +18,104 @@ logging.basicConfig(
     filemode='a'
 )
 
+SCAN_FREQUENCY = 48000  # Hz
+
 
 async def run_sound_card_cycle(starting_time: float):
     """Runs the sound card cycle according to the timeline.
+    This function is responsible for the control of the sound card which in turn controls:
+    - The motor
+    - The thermistors
+    - The I-VED technique
 
     Args:
         starting_time (float): The time at which the program started.
     """
     logging.info("Starting sound card cycle")
-    logging.debug("Sound card is OFF")
-
-    while (time.perf_counter() - starting_time < TimelineEnum.SODS_ON.get_adapted_value):
-        await DataStorage().save_sound_card_status(0)
-        logging.debug("Sound card is OFF")
-        await asyncio.sleep(0.3)
-
-    record_for = TimelineEnum.SODS_OFF.value - TimelineEnum.SODS_ON.value
 
     try:
-        start_recording(record_for)
-    except Exception:
+
+        card = U3()
+        card.configU3()
+        card.getCalibrationData()
+        card.configIO(  # TODO: Look up what each of these parameters do
+            FIOAnalog=3,
+            NumberOfTimersEnabled=2
+        )
+        logging.debug("Configuring Sound Card")
+
+        card.configTimerClock(
+            TimerClockBase=3,
+            TimerClockDivisor=1
+        )
+
+        card.streamConfig(  # TODO: Look up what each of these parameters do
+            NumChannels=2,
+            PChannels=[0, 1, 2, 3],
+            NChannels=[31, 31, 31, 31],
+            Resolution=3,
+            ScanFrequency=SCAN_FREQUENCY
+        )
+
+        card.streamStart()
+    except Exception as e:
         logging.error("An Error has occured in the Sound Card Driver")
+        logging.error(e)
         await DataStorage().save_sound_card_status(3)
         return
 
-    await DataStorage().save_sound_card_status(2)
-    logging.info("Sound card is RECORDING")
-
     while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
-        await DataStorage().save_sound_card_status(2)
-        logging.debug("Sound card is RECORDING")
+
+        temperature_of_card = card.getTemperature()
+
+        # FIXME: This is voltage and it needs to be converted to temperature by using the utils.thermistor_util
+        temperature_of_thermistor1 = card.getAIN(2)
+        temperature_of_thermistor2 = card.getAIN(3)
+
+        await DataStorage().save_temperature_of_sensor(temperature_of_card, 3)
+        await DataStorage().save_temperature_of_sensor(temperature_of_thermistor1, 1)
+        await DataStorage().save_temperature_of_sensor(temperature_of_thermistor2, 2)
+
+        ived_status = await DataStorage().get_sound_card_status()
+        if time.perf_counter() - starting_time > TimelineEnum.SODS_ON.get_adapted_value and ived_status != 2:
+            await DataStorage().save_sound_card_status(2)
+
+            record_for = TimelineEnum.SODS_OFF.get_adapted_value - \
+                TimelineEnum.SODS_ON.get_adapted_value
+
+            threading.Thread(  # TODO: Configure this
+                target=start_recording,
+                args=(record_for, card),
+                daemon=True
+            ).start()
+
+            logging.info("I-VED is ON and the sound card is RECORDING")
+        elif time.perf_counter() - starting_time < TimelineEnum.SODS_ON.get_adapted_value or time.perf_counter() - starting_time > TimelineEnum.SODS_OFF.get_adapted_value:
+            await DataStorage().save_sound_card_status(1)
+            logging.info("I-VED is OFF")
+
+        motor_status = await DataStorage().get_motor_speed()
+        if time.perf_counter() - starting_time > TimelineEnum.START_MOTOR.get_adapted_value and motor_status != MotorSpeedsEnum.FULL_SPEED.value:
+            await DataStorage().save_motor_speed(MotorSpeedsEnum.FULL_SPEED.value)
+
+            run_motor_for = TimelineEnum.SOE_OFF.value - TimelineEnum.START_MOTOR.value
+
+            threading.Thread(
+                target=run_motor_cycle,
+                args=(run_motor_for, card),
+                daemon=True
+            ).start()
+
+            logging.info("Motor is ON and running at FULL_SPEED")
+        elif time.perf_counter() - starting_time < TimelineEnum.START_MOTOR.get_adapted_value or time.perf_counter() - starting_time > TimelineEnum.SOE_ON.get_adapted_value:
+            await DataStorage().save_motor_speed(MotorSpeedsEnum.STOP.value)
+            logging.info("Motor is OFF or has STOPPED")
+
         await asyncio.sleep(0.3)
 
-    logging.info("Sound card has STOPPED RECORDING")
+    await DataStorage().save_sound_card_status(0)
     logging.info("Finished sound card cycle")
+
+    logging.info("Stopping the stream...")
+    card.streamStop()
+    card.close()

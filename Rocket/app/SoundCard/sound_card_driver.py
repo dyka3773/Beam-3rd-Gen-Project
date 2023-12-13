@@ -1,9 +1,8 @@
 import logging
 import time
-import threading
-import math
 
 import u3
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,51 +15,19 @@ logging.basicConfig(
 SCAN_FREQUENCY = 48000  # Hz
 
 
-def start_recording(record_for: float = 650):
+def start_recording(card: u3.U3, record_for: float = 650):
     """Starts recording with the sound card.
 
     Args:
         record_for (int, optional): The number of seconds to record for. Defaults to 650.
     """
+    start = time.perf_counter()
+
     try:
-        card = u3.U3()
-        card.configU3()
-        card.getCalibrationData()
-        card.configIO(FIOAnalog=3)  # NOTE: What does this do?
+        with open("AIO0-1.txt", "w+") as file:
 
-        logging.debug("Configuring sound card")
-        card.streamConfig(  # TODO: Look up what each of these parameters do
-            NumChannels=2,
-            PChannels=[0, 1, 2],
-            NChannels=[31, 31],
-            Resolution=3,
-            ScanFrequency=SCAN_FREQUENCY
-        )
+            file.write("AIN0, AIN1\n")
 
-        threading.Thread(target=record, args=(card, record_for)).start()
-    except Exception as e:
-        logging.error("Error in sound card driver")
-        logging.error(e)
-        raise e
-
-
-def record(card: u3.U3, record_for: int = 650):
-    """Records from the sound card for the specified amount of time.
-
-    Args:
-        card (u3.U3): The sound card to record from.
-        record_for (int, optional):  The number of seconds to record for. Defaults to 650.
-
-    Raises:
-        e: Any exception that occurs while recording.
-    """
-    try:
-        logging.debug("Start stream")
-        card.streamStart()
-        start = time.perf_counter()
-        logging.debug(f"Start time is {start}")
-
-        with open("AIO0.txt", 'w+') as input0, open("AIO1.txt", 'w+') as input1:
             for data_batch in card.streamData():
 
                 # The stream will stop only if we have surpassed the record_for time
@@ -68,7 +35,6 @@ def record(card: u3.U3, record_for: int = 650):
                     break
 
                 if data_batch is not None:
-
                     if data_batch["errors"] != 0:
                         logging.debug(
                             f"Errors counted: {data_batch['errors']} ; {time.perf_counter()}")
@@ -80,15 +46,7 @@ def record(card: u3.U3, record_for: int = 650):
                     if data_batch["missed"] != 0:
                         logging.warn(f"+++ Missed {data_batch['missed']}")
 
-                    # Writing the input to two separate files
-                    input0.write(f"{data_batch['AIN0']}")
-                    input1.write(f"{data_batch['AIN1']}")
-
-                    results = card.processStreamData(data_batch['results'])
-
-                    r_aio2 = results['AIN2']
-
-                    print(f"AIN2: {r_aio2}")
+                    file.write(f"{data_batch['AIN0']}, {data_batch['AIN1']}\n")
 
                 else:
                     # Got no data back from our read.
@@ -98,35 +56,3 @@ def record(card: u3.U3, record_for: int = 650):
     except Exception as e:
         logging.error("Error while recording from sound card")
         logging.error(e)
-    finally:
-        card.streamStop()
-        logging.debug("Stream stopped.")
-        card.close()
-
-def temp_read(card: u3.U3):
-    V_t=2.44  ## Αυτή είναι η τιμή τής (συνολικής) τάσης στο κύκλωμα τού voltage divider (Vcc (power supply)). (Εδώ είναι mock, στο πλαίσιο τού αρχικού κώδικα.)
-              ## Όπως αναφέρω και παρακάτω, το LabJack-LV έχει (για τη δική μας χρήση) ένα range (για ανάγνωση) 0-2,44V. Θα χρειαστεί, είτε άμεσα, είτε με κάποιον
-              ## (επιπλέον) divider, να δώσουμε στο κύκλωμα τού thermistor κατάλληλη τάση (Vcc) (όπως την αναφέρω και παρακάτω, 2,44V (ή πολύ κοντά, από κάτω)).
-              ## Εικάζω ότι θα λειτουργήσει αποδοτικά (ειδικά, εδώ, από πλευράς range και ανάλυσης(-ευαισθησίας)). Ό,τι χρειάζεται, γενικά, το αναδιαμορφώνουμε.
-    R_k=10000 ## Η τιμή τής γνωστής αντίστασης στον (διπλό) voltage divider μας. (Εδώ είναι mock, στο πλαίσιο τού αρχικού κώδικα.) Γενικά, νομίζω, είναι καλό η τιμή
-              ## να είναι συγκρίσιμη με αυτή (τη μέση;) τού thermistor (πληροφοριακά, εδώ λαμβάνω υπόψη το ένα από τα δύο (και το τρίτο στη
-              ## λίστα) thermistors που έχει στα datasheets του το Electrical, το οποίο, όπως αναφέρω και παρακάτω, ανεβάζω στο archive).
-    T_0=298.15  ## Τόσο είναι σε Kelvin η θερμοκρασία δωματίου, 25oC. Θερμοκρασίες Kelvin είναι αυτές που επεξεργάζεται η εξίσωση, παρακάτω.
-    B=3575  ## Η συγκεκριμένη τιμή λέγεται beta value και είναι χαρακτηριστική για κάθε thermistor. Το μοντέλο, παρακάτω, είναι ένα κοινό μοντέλο υπολογισμού τής θερμοκρασίας (τού thermistor) από την τιμή τής αντίστασής
-            ## του. Ας ξεκινήσουμε με αυτό και, αν χρειαστούμε βελτιώσεις, θα περάσουμε σε ένα, υπάρχει η πιθανότητα, πιο ακριβές μοντέλο (τότε, αν είναι, θα γράψω και ένα πρόγραμμα για το ανάλογο calibration, με το
-            ## μοντέλο εδώ δεν χρειάζεται κάποιου είδους calibration, γιατί οι τιμές που χρησιμοποιεί δίνονται συχνά (όπως και εδώ) εργοστασιακά για το εκάστοτε thermistor). Μικρή τελευταία σημείωση: χρησιμοποίησα μια
-            ## τιμή από τη λίστα στο datasheet, για το thermistor, που αφήνω στο archive. Επέλεξα το τρίτο από τη λίστα (γιατί πολλά από αυτά στη λίστα είχαν αυτό το beta value, οπότε το θεώρησα πιθανότερο να πέσω μέσα).
-            ## Αν χρειαστεί να κάνουμε κάποια αλλαγή, ανάλογα με το thermistor που αξιοποιεί το Electrical, θα το αλλάξουμε όπως χρειάζεται.
-    R_0=10000  ## Αυτή είναι η αντίσταση τού (τρίτου στη λίστα, όπως ανέφερα) thermistor στους 25oC.
-    V_in=card.getAIN(2) ## Με τη συγκεκριμένη κλήση αυτής τής μεθόδου από το library τού U3, διαβάζουμε την τάση εισόδου στο FIO2. Προφανώς, πρώτα, θα πρέπει να έχει γίνει στο πρόγραμμα χρήσης instantiated και
-                        ## initialised το U3 που χρησιμοποιούμε (όπως και, απ' ό,τι καταλαβαίνω, γίνεται). Αν χρειαστεί, πάλι ανάλογα με τη χρήση από το Electrical, να αλλάξει το FIO pin, το αλλάζουμε στη συνέχεια.
-                        ## Τελευταία σημείωση: η LV έκδοση τού U3 που χρησιμοποιούμε έχει ένα voltage range 0-2,44V, οπότε θα πρέπει να έχουμε εξασφαλίσει ένα input σε αυτό το range (δε θα ήταν άσχημο, κιόλας, στα 2,44V
-                        ## ακριβώς (ή πολύ κοντά, από κάτω)).
-    R_measured=(V_in/V_t)*R_k  ## Αυτή είναι η εξίσωση, όπως υπολόγισα, για τον υπολογισμό τής αντίστασης τού thermistor από (διπλό) voltage divider. Αν υπάρχει
-                               ## κάποιο λάθος, την αλλάζουμε.
-    therm_temp=((T_0*B)/(B+T_0*math.log(R_measured/R_0))-273.15) ## Η συγκεκριμένη είναι η "Εξίσωση Β" (με beta value) που είναι μία από τις οποίες
-                                                                 ## χρησιμοποιούνται για την προσέγγιση θερμοκρασίας για thermistor, σύμφωνα με τη βιβλιογραφία μου.
-                                                                 ## Είναι μια πρώτη (ίσως και αρκετή) καλή προσέγγιση που μπορούμε να χρησιμοποιήσουμε. Αν
-                                                                 ## χρειαστεί κάποια αλλαγή, θα το δούμε. Η συγκεκριμένη είναι χωρίς κάποια ανάγκη για calibration,
-                                                                 ## οπότε είναι έτοιμη προς χρήση. Το τεστ θα δείξει και αν μάς κάνει.
-    return therm_temp  ## Αυτή είναι η τελική μετρούμενη θερμοκρασία (τού thermistor (!) (ίσως να 'ναι σημαντική αυτή η αναφορά (για κάποιο time delay κ.λπ.))).

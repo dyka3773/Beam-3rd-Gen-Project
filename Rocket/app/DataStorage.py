@@ -41,7 +41,6 @@ class DataStorage:
         with sqlite.connect(self.db_filename, timeout=10) as db:
             db.executescript('''
                     DROP TABLE IF EXISTS ROCKET_DATA;
-                    DROP TABLE IF EXISTS MODE;
 
                     -- TODO: Add contraints in the values of the columns where needed
 
@@ -50,27 +49,16 @@ class DataStorage:
                         motor_speed INTEGER,        -- The speed of the motor in (rpm?)
                         sound_card_status INTEGER,  -- The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
                         camera_status INTEGER,      -- The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
-                        cell_heater_status BOOLEAN,      -- The status of the cell heater. Possible values: 0 = OFF, 1 = ON
-                        electronics_heater_status BOOLEAN,      -- The status of the electronics heater. Possible values: 0 = OFF, 1 = ON
                         temp_1 REAL,                -- The temperature of the first sensor in (Celsius?)
                         temp_2 REAL,                -- The temperature of the second sensor in (Celsius?)
-                        -- Add sensors here if needed
-                        pressure_1 REAL,            -- The pressure of the first sensor in (atm?)
-                        pressure_2 REAL,            -- The pressure of the second sensor in (atm?)
+                        temp_3 REAL,                -- The temperature of the sound card sensor in (Kelvin)
                         -- Add sensors here if needed
                         LO_signal BOOLEAN,          -- The status of the LO signal. Possible values: 0 = OFF, 1 = ON
                         SOE_signal BOOLEAN,         -- The status of the SOE signal. Possible values: 0 = OFF, 1 = ON
                         SODS_signal BOOLEAN,        -- The status of the SODS signal. Possible values: 0 = OFF, 1 = ON
-                        PO_signal BOOLEAN,          -- The status of the PO signal. Possible values: 0 = OFF, 1 = ON. (It should always be 1)
                         error_code INTEGER,         -- The error code of the system in case of an error. Possible values: TBD
                         PRIMARY KEY (time)
-                    );
-                    
-                    CREATE TABLE MODE (
-                        time DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')),
-                        mode TEXT,                  -- The mode of the experiment. Possible values: TEST, FLIGHT
-                        PRIMARY KEY (mode, time)
-                    );                    
+                    );                   
                 ''')
 
             db.commit()
@@ -110,29 +98,7 @@ class DataStorage:
             await sqlu.add_camera_status(cursor, camera_status)
             await db.commit()
 
-    async def add_cell_heater_status(self, heater_status: bool):
-        """Adds the status of the heater to the database.
-
-        Args:
-            heater_status (bool): The status of the heater. Possible values: 0 = OFF, 1 = ON
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            await sqlu.add_cell_heater_status(cursor, heater_status)
-            await db.commit()
-
-    async def add_electronics_heater_status(self, heater_status: bool):
-        """Adds the status of the heater to the database.
-
-        Args:
-            heater_status (bool): The status of the heater. Possible values: 0 = OFF, 1 = ON
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            await sqlu.add_electronics_heater_status(cursor, heater_status)
-            await db.commit()
-
-    async def _save_temperature_of_sensor(self, temp: float, sensor_num: int):
+    async def save_temperature_of_sensor(self, temp: float, sensor_num: int):
         """Adds the temperature of a specified sensor to the database.
 
         Args:
@@ -142,18 +108,6 @@ class DataStorage:
         async with sql.connect(self.db_filename, timeout=10) as db:
             cursor = await db.cursor()
             await sqlu.add_temp_to_sensor(cursor, temp, sensor_num)
-            await db.commit()
-
-    async def _save_pressure_of_sensor(self, pressure: float, sensor_num: int):
-        """Adds the pressure of a specified sensor to the database.
-
-        Args:
-            pressure (float): The pressure of the sensor to be added to the database.
-            sensor_num (int): The number of the sensor to be added to the database.
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            await sqlu.add_pressure_to_sensor(cursor, pressure, sensor_num)
             await db.commit()
 
     async def save_status_of_signal(self, status: bool, signal_name: str):
@@ -168,6 +122,20 @@ class DataStorage:
             await sqlu.add_signal_status(cursor, status, signal_name)
             await db.commit()
 
+    async def save_signals(self, LO: bool, SOE: bool, SODS: bool):
+        """Adds the status of the signals to the database.
+
+        Args:
+            LO (bool): The status of the LO signal. Possible values: True = ON, False = OFF
+            SOE (bool): The status of the SOE signal. Possible values: True = ON, False = OFF
+            SODS (bool): The status of the SODS signal. Possible values: True = ON, False = OFF
+        """
+        await asyncio.gather(
+            self.save_status_of_signal(LO, 'LO'),
+            self.save_status_of_signal(SOE, 'SOE'),
+            self.save_status_of_signal(SODS, 'SODS')
+        )
+
     async def save_error_code(self, error_code: int):
         """Adds the error code of the system to the database.
 
@@ -178,22 +146,6 @@ class DataStorage:
             cursor = await db.cursor()
             await sqlu.add_error_code(cursor, error_code)
             await db.commit()
-
-    async def save_sensor_data(self, temp_1: float, temp_2: float, press_1: float, press_2: float):
-        """Adds the data of the sensors to the database.
-
-        Args:
-            temp_1 (float): The temperature of the first sensor in (Celsius?)
-            temp_2 (float): The temperature of the second sensor in (Celsius?)
-            press_1 (float): The pressure of the first sensor in (atm?)
-            press_2 (float): The pressure of the second sensor in (atm?)
-        """
-        await asyncio.gather(
-            self._save_temperature_of_sensor(temp_1, 1),
-            self._save_temperature_of_sensor(temp_2, 2),
-            self._save_pressure_of_sensor(press_1, 1),
-            self._save_pressure_of_sensor(press_2, 2),
-        )
 
     async def get_motor_speed(self) -> int | None:
         """Gets the speed of the motor from the database.
@@ -221,45 +173,6 @@ class DataStorage:
 
         return status
 
-    async def get_camera_status(self) -> int | None:
-        """Gets the status of the camera from the database.
-
-        Returns:
-            int: The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            status = await sqlu.get_camera_status(cursor)
-            await db.commit()
-
-        return status
-
-    async def get_cell_heater_status(self) -> bool | None:
-        """Gets the status of the heater from the database.
-
-        Returns:
-            bool: The status of the heater. Possible values: 0 = OFF, 1 = ON
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            status = await sqlu.get_cell_heater_status(cursor)
-            await db.commit()
-
-        return status
-
-    async def get_electronics_heater_status(self) -> bool | None:
-        """Gets the status of the heater from the database.
-
-        Returns:
-            bool: The status of the heater. Possible values: 0 = OFF, 1 = ON
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            status = await sqlu.get_electronics_heater_status(cursor)
-            await db.commit()
-
-        return status
-
     async def get_temp_of_sensor_for_the_last_x_secs(self, sensor_num: int, secs_ago: int = 1) -> Iterable[Row] | None:
         """Gets the temperature of a specified sensor from the database.
 
@@ -276,38 +189,6 @@ class DataStorage:
             await db.commit()
 
         return temp
-
-    async def get_pressure_of_sensor(self, sensor_num: int) -> float | None:
-        """Gets the pressure of a specified sensor from the database.
-
-        Args:
-            sensor_num (int): The number of the sensor to get the pressure from.
-
-        Returns:
-            float: The pressure of the specified sensor.
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            pressure = await sqlu.get_pressure_of_sensor(cursor, sensor_num)
-            await db.commit()
-
-        return pressure
-
-    async def get_status_of_signal(self, signal_name: str) -> bool | None:
-        """Gets the status of a specified signal from the database.
-
-        Args:
-            signal_name (str): The name of the signal to get the status from.
-
-        Returns:
-            bool: The status of the specified signal.
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            status = await sqlu.get_status_of_signal(cursor, signal_name)
-            await db.commit()
-
-        return status
 
     async def get_error_code(self) -> int | None:
         """Gets the error code of the system from the database.
@@ -334,31 +215,3 @@ class DataStorage:
             await db.commit()
 
         return data
-
-    async def save_mode(self, mode: str):
-        """Adds the mode of the experiment to the database.
-
-        Args:
-            mode (str): The mode of the experiment to be added to the database.
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            await sqlu.add_mode(cursor, mode)
-            await db.commit()
-
-    async def get_mode(self) -> str:
-        """Gets the mode of the experiment from the database.
-
-        Returns:
-            str: The mode of the experiment.
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            mode = await sqlu.get_mode(cursor)
-            await db.commit()
-
-        if mode:
-            return mode
-        else:
-            await asyncio.sleep(0.1)
-            return await self.get_mode()
