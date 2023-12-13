@@ -4,15 +4,34 @@ import u3
 SCAN_FREQUENCY = 48000  # Hz
 
 
+def calibrate_temperature_reading(voltage_in: float):
+    V_t = 5  # Vcc (power supply) voltage from LabJack
+
+    R_k = 10000  # Thermistor's resistance
+
+    T_0 = 298.15  # Room temperature in Kelvin
+
+    B = 3984  # Beta value
+
+    R_0 = 1000  # Resistance next to the thermistor in ohms
+
+    R_measured = (voltage_in/V_t)*R_k  # Calculated resistance of thermistor
+
+    # Final temperature in Celsius.
+    therm_temp = ((T_0*B)/(B+T_0*math.log(R_measured/R_0))-273.15)
+
+    return therm_temp
+
+
 card = u3.U3()
 card.configU3()
 card.getCalibrationData()
-card.configIO(FIOAnalog=3)  # NOTE: What does this do?
+card.configIO(FIOAnalog=3)
 
-card.streamConfig(  # TODO: Look up what each of these parameters do
+card.streamConfig(
     NumChannels=3,
-    PChannels=[0, 1, 2],
-    NChannels=[31, 31, 31],
+    PChannels=[2],
+    NChannels=[31],
     Resolution=3,
     ScanFrequency=SCAN_FREQUENCY
 )
@@ -20,22 +39,17 @@ card.streamConfig(  # TODO: Look up what each of these parameters do
 try:
     card.streamStart()
 
-    with open("AIO0.txt", 'w+') as input0, open("AIO1.txt", 'w+') as input1:
-        for data_batch in card.streamData():
-            if data_batch is not None:
+    for data_batch in card.streamData():
+        if data_batch is not None:
 
-                # Writing the input to two separate files
-                input0.write(f"{data_batch['AIN0']}")
-                input1.write(f"{data_batch['AIN1']}")
+            print(f"AIN2: {data_batch['AIN2']}")
+            print(
+                f"Temperature? : {calibrate_temperature_reading(data_batch['AIN2'])}")
+            r_aio2 = sum(data_batch['AIN2'])/len(data_batch['AIN2'])
 
-                #results = card.processStreamData(data_batch)
-
-                #conversion = lambda x : 10000/(1023/x - 1)
-
-                r_aio2 = sum(data_batch['AIN2'])/len(data_batch['AIN2'])
-                
-                #print(card.processStreamData(data_batch['AIN2']))
-                print(f"ain2: {r_aio2}")
+            print(f"ain2 average: {r_aio2}")
+            print(
+                f"Temperature average? : {calibrate_temperature_reading(r_aio2)}")
 except KeyboardInterrupt as e:
     print("exiting...")
 finally:

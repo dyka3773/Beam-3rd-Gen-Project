@@ -1,8 +1,8 @@
 import serial
 
 # Replace 'COM5' and 'COM6' with the virtual ports you created
-# ser4 = serial.Serial('COM4', baudrate=9600, timeout=0.33)
-ser4 = serial.Serial('/dev/ttyTHS1', baudrate=9600, timeout=0.33)
+# ser4 = serial.Serial('COM4', baudrate=38400, timeout=0.33)
+ser4 = serial.Serial('/dev/ttyTHS1', baudrate=38400, timeout=0.33)
 
 try:
     while True:
