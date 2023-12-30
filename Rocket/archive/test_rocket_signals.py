@@ -25,8 +25,8 @@ def get_status_of_signal(signal):
 
 
 while True:
-    print(get_status_of_signal(11))
-    print(get_status_of_signal(13))
-    print(get_status_of_signal(15))
+    print(f"LO: {get_status_of_signal(11)}")
+    print(f"SOE: {get_status_of_signal(13)}")
+    print(f"SODS: {get_status_of_signal(15)}")
     print()
     time.sleep(1)
