@@ -1,4 +1,4 @@
-import time
+import math
 import u3
 
 SCAN_FREQUENCY = 48000  # Hz
