@@ -7,8 +7,14 @@
 - [ ] Present everything in a single window:
   - [ ] "Health" monitoring indicators (e.g. power is received, camera is on/off, LEDs are on/off, …) to indicate that the experiment is working properly.
   - [ ] Indicators showing which rocket signals (LO, SODS, SOE) have been received.
+- [ ] Add a Receiver that runs on the ground station and receives the data from the rocket.
 
 
 ## Rocket
 
 - [ ] Make sure that every event that is after liftoff is taking into account whether the LO signal has been received or not at some point in time.
+- [ ] **Maybe** also have a config file that says whether we should run the motor or not (for testing purposes).
+- [ ] Shift the motor timeline +16secs to the right
+- [ ] Shift the end to the timeline and Power off earlier because there will be a landing much earlier than expected. Also consult with the team and previous experiment data to see when the power should be turned off and when the landing is expected to happen.
+- [ ] Calibrate thermistor values (Offloaded some work to @KonstadinaN)
+- [ ] Rocket signal recognition
