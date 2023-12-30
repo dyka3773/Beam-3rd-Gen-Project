@@ -1,6 +1,8 @@
 import math
+from functools import cache
 
 
+@cache
 def calibrate_temperature_reading(voltage_in: float):
     """Calibrates the temperature reading from the thermistor.
 
@@ -28,6 +30,7 @@ def calibrate_temperature_reading(voltage_in: float):
     return therm_temp
 
 
+@cache
 def ilias_calibrate_temperature_reading(voltage_in: float):
     """Calibrates the temperature reading from the thermistor.
 

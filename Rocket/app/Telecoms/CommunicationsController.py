@@ -3,6 +3,7 @@ import asyncio
 import logging
 import time
 from serial_asyncio import open_serial_connection
+from functools import cache
 
 from DataStorage import DataStorage
 from Enums.ErrorCodesEnum import ErrorCodesEnum
@@ -54,6 +55,7 @@ async def run_telecoms_cycle(starting_time: float):
         await DataStorage().save_error_code(ErrorCodesEnum.CONNECTION_ERROR.value)
 
 
+@cache
 def format_data_to_send(*data):
     """Formats the data to send to the serial port into a byte array.
 
