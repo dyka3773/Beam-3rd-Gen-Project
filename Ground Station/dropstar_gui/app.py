@@ -1,43 +1,30 @@
-from flask import Flask, render_template, request, url_for
-
+from flask import Flask, render_template, request
+from functools import cache
+from threading import Thread
+from typing import Mapping, Tuple
 import asyncio
 
-from controllers import home_page, downlink_page, uplink_page, figures as figs, status as experiment_status
-from controllers.tests import with_fluid, without_fluid
+from controllers import home_page, downlink_page, figures as figs, status as experiment_status
+from telecoms import rxsm_receiver
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 
 @app.route('/')
-def index():
+def index() -> str:
     return home_page.render()
 
 
 @app.route('/downlink/')
-def downlink():
+def downlink() -> str:
     return downlink_page.render()
-
-
-@app.route('/uplink/')
-def uplink():
-    return uplink_page.render()
-
-
-@app.route('/test-with-fluid/')
-def test_with_fluid():
-    return with_fluid.render_page()
-
-
-@app.route('/test-without-fluid/')
-def test_without_fluid():
-    return without_fluid.render_page()
 
 
 # The following routes are for special purposes and do not serve any pages
 
 @app.route('/figures/<figure_name>')
-async def figures(figure_name: str):
+async def figures(figure_name: str) -> tuple[str, int] | str:
     """Sends an image to the client.
 
     Args:
@@ -55,71 +42,36 @@ async def figures(figure_name: str):
 
 
 @app.get('/status/')
-async def status():
+async def status() -> Tuple[Mapping[str, str | int | None], int]:
     """Gets the status of the system.
 
     Returns:
         Returns a tuple containing the status and the HTTP status code.
     """
 
-    motor_speed, sound_card_status, camera_status, heater_status = await asyncio.gather(
+    motor_speed, sound_card_status, camera_status, LO, SOE, SODS, error_code = await asyncio.gather(
         experiment_status.get_motor_speed(),
         experiment_status.get_sound_card_status(),
         experiment_status.get_camera_status(),
-        experiment_status.get_heater_status()
+        experiment_status.get_LO_signal(),
+        experiment_status.get_SOE_signal(),
+        experiment_status.get_SODS_signal(),
+        experiment_status.get_errors()
     )
 
     status = {
         'motor_speed': motor_speed,
         'sound_card_status': sound_card_status,
         'camera_status': camera_status,
-        'heater_status': heater_status,
+        'LO_status': LO,
+        'SOE_status': SOE,
+        'SODS_status': SODS,
+        'errors': error_code
     }
     return status, 200
 
 
-@app.get('/delete_data/')
-def delete_data():
-    """Deletes the data from the CSV file on the rocket
-
-    Returns:
-        Returns a tuple containing the status and the HTTP status code.
-    """
-    data_were_deleted = experiment_status.delete_data()
-    return ('OK', 200) if data_were_deleted else ('Error', 417)
-
-
-@app.post('/status/check/<component>')
-def check(component: str):
-    """Checks the status of a component.
-
-    Args:
-        component (str): The component to be checked.
-
-    Returns:
-        Returns a tuple containing the status and the HTTP status code.
-    """
-    if component == 'motor':
-        status = experiment_status.check_motor()
-    elif component == 'sound_card':
-        status = experiment_status.check_sound_card()
-    elif component == 'camera':
-        status = experiment_status.check_camera()
-    elif component == 'heater':
-        status = experiment_status.check_heater()
-    else:
-        return "Component not found", 400
-
-    app.logger.info(f"Component {component} status: {status}")
-
-    if status == True:
-        return "OK", 200
-    else:
-        return "Error", 417
-
 # The following routes are for error handling
-
-
 @app.errorhandler(404)
 def page_not_found(error):
     """Handles 404 errors.
@@ -133,9 +85,9 @@ def page_not_found(error):
     app.logger.error(f"Page not found. The requested URL was: {request.url}")
     return render_template('404.j2'), 404
 
-# The folloring route is for favicon
 
-
+# The following route is for favicon
+@cache
 @app.route('/favicon.ico')
 def favicon():
     """Sends the favicon to the client.
@@ -145,6 +97,13 @@ def favicon():
     """
     return app.send_static_file('img/favicon.png')
 
+
+# Start the receiver thread
+receiver_thread = Thread(
+    target=rxsm_receiver.receive_data,
+    daemon=True
+)
+receiver_thread.start()
 
 if __name__ == '__main__':
     app.run(

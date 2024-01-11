@@ -16,8 +16,9 @@ function setMotorStatus(motor, speed){
     }
     else {
         $(motor).html(`Error  \t\t (${speed})`)
-        $(motor).css("bg-color", "black")
-        $(motor).css("color", "white")
+        $(motor).removeClass()
+        $(motor).addClass("text-warning")
+        $(motor).addClass("text-dark")
     }
 }
 
@@ -34,8 +35,9 @@ function setSoundCardStatus(soundCard, status){
     }
     else {
         $(soundCard).html(`Error  \t\t (${status})`)
-        $(soundCard).css("bg-color", "black")
-        $(soundCard).css("color", "white")
+        $(soundCard).removeClass()
+        $(soundCard).addClass("text-warning")
+        $(soundCard).addClass("text-dark")
     }
 }
 
@@ -52,37 +54,78 @@ function setCameraStatus(camera, status){
     }
     else {
         $(camera).html(`Error  \t\t (${status})`)
-        $(camera).css("bg-color", "black")
-        $(camera).css("color", "white")
+        $(camera).removeClass()
+        $(camera).addClass("text-warning")
+        $(camera).addClass("text-dark")
     }
 }
 
-function setHeaterStatus(heater, status){
+function setLOStatus(lo, status){
     if (status == false){
-        $(heater).html("OFF")
-        $(heater).removeClass()
-        $(heater).addClass("text-danger")
+        $(lo).html("OFF")
+        $(lo).removeClass()
+        $(lo).addClass("text-danger")
     }
     else if (status == true){
-        $(heater).html("ON")
-        $(heater).removeClass()
-        $(heater).addClass("text-success")
+        $(lo).html("ON")
+        $(lo).removeClass()
+        $(lo).addClass("text-success")
     }
     else {
-        $(heater).html(`Error  \t\t (${status})`)
-        $(heater).css("bg-color", "black")
-        $(heater).css("color", "white")
+        $(lo).html(`Error  \t\t (${status})`)
+        $(lo).removeClass()
+        $(lo).addClass("text-warning")
+        $(lo).addClass("text-dark")
     }
 }
 
-/**
- * Displays a toast message on the screen
- * @param {string} id The id or class of the toast to be shown
- */
-function showToast(id){
-    var toastElList = [].slice.call(document.querySelectorAll(id))
-    var toastList = toastElList.map(function(toastEl) {
-        return new bootstrap.Toast(toastEl)
-    })
-    toastList.forEach(toast => toast.show()) 
+function setSOEStatus(soe, status){
+    if (status == false){
+        $(soe).html("OFF")
+        $(soe).removeClass()
+        $(soe).addClass("text-danger")
+    }
+    else if (status == true){
+        $(soe).html("ON")
+        $(soe).removeClass()
+        $(soe).addClass("text-success")
+    }
+    else {
+        $(soe).html(`Error  \t\t (${status})`)
+        $(soe).removeClass()
+        $(soe).addClass("text-warning")
+        $(soe).addClass("text-dark")
+    }
+}
+
+function setSODSStatus(sods, status){
+    if (status == false){
+        $(sods).html("OFF")
+        $(sods).removeClass()
+        $(sods).addClass("text-danger")
+    }
+    else if (status == true){
+        $(sods).html("ON")
+        $(sods).removeClass()
+        $(sods).addClass("text-success")
+    }
+    else {
+        $(sods).html(`Error  \t\t (${status})`)
+        $(sods).removeClass()
+        $(sods).addClass("text-warning")
+        $(sods).addClass("text-dark")
+    }
+}
+
+function setErrors(errorElement, code){
+    if (code){
+        $(errorElement).html(code)
+        $(errorElement).removeClass()
+        $(errorElement).addClass("text-danger")
+    }
+    else {
+        $(errorElement).html("No Error")
+        $(errorElement).removeClass()
+        $(errorElement).addClass("text-success")
+    }
 }

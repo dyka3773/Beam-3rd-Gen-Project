@@ -34,23 +34,8 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('downlink') }}">Downlink</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('test_with_fluid') }}">Test With Fluid</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('test_without_fluid') }}">Test Without Fluid</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Dev Tools
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <li><a class="dropdown-item" href="{{ url_for('uplink') }}">Uplink</a></li>
-                            </ul>
-                        </li>
                     </ul>
                 </div>
-                <button type="button" id="deleteBtn" class="btn btn-outline-info">Delete Data on Rocket</button>
             </div>
         </nav>
     </header>
@@ -74,39 +59,6 @@
         {% endif %}
 
     </main>
-
-    <div class="toast-container">
-        <div id="successToast" class="toast d-flex align-items-center text-white bg-success border-0 fade" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-body ">
-                Data on the rocket has been deleted!
-            </div>
-            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div id="errorToast" class="toast d-flex align-items-center text-white bg-danger border-0 fade" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-body ">
-                Something went wrong!
-            </div>
-            <button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-    
-    <script>
-
-        $(document).ready(function() {
-            $("#deleteBtn").click(function() {
-                $.ajax({
-                    url: "{{ url_for('delete_data') }}",
-                    type: "GET",
-                    success: function(response) {
-                        showToast("#successToast");
-                    },
-                    error: function(xhr) {
-                        showToast("#errorToast");
-                    }
-                });
-            });
-        });
-    </script>
 
     <!-- Bootstrap JS -->
     <script src="{{ url_for('static', filename='bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>

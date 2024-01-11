@@ -2,12 +2,12 @@
 
 ## Ground Station
 
-- [ ] Decouple the info section so that it presents the same data everywhere without having to copy paste the code. (Have a single source of truth)
+- [X] Decouple the info section so that it presents the same data everywhere without having to copy paste the code. (Have a single source of truth)
 - [ ] Modify the Ground Station README to have a "How to use" section and run it by someone who has never used it before.
-- [ ] Present everything in a single window:
-  - [ ] "Health" monitoring indicators (e.g. power is received, camera is on/off, LEDs are on/off, …) to indicate that the experiment is working properly.
-  - [ ] Indicators showing which rocket signals (LO, SODS, SOE) have been received.
-- [ ] Add a Receiver that runs on the ground station and receives the data from the rocket.
+- [X] Present everything in a single window:
+  - [X] "Health" monitoring indicators (e.g. power is received, camera is on/off, LEDs are on/off, …) to indicate that the experiment is working properly.
+  - [X] Indicators showing which rocket signals (LO, SODS, SOE) have been received.
+- [X] Add a Receiver that runs on the ground station and receives the data from the rocket.
 
 
 ## Rocket

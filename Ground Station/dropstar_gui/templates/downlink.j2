@@ -3,9 +3,8 @@
 <div class="row">
     <div class="d-flex justify-content-evenly">
         <figure id="plot1" class="figure" style="width:40%"></figure>
-        <figure  id="plot2" class="figure" style="width:40%"></figure>
-        <div class="card" style="width:20%">
-            <h3 style="text-align: center;">Status</h3>
+        <div class="card" style="width:30%">
+            <h3 style="text-align: center;">Components Status</h3>
             <div class="d-flex flex-column justify-content-evenly" style="height:90%">
                 <div id="motor" class="p-2">
                     <p><strong>Motor: </strong><span id="motorStatus">-</span></p>
@@ -16,8 +15,22 @@
                 <div id="camera" class="p-2">
                     <p><strong>Camera: </strong><span id="cameraStatus">-</span></p>
                 </div>
-                <div id="heater" class="p-2">
-                    <p><strong>Heater: </strong><span id="heaterStatus">-</span></p>
+                <div id="errorsCodes" class="p-2">
+                    <p><strong>Error Code: </strong><span id="errors">-</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="card" style="width:30%">
+            <h3 style="text-align: center;">Signal Status</h3>
+            <div class="d-flex flex-column justify-content-evenly" style="height:90%">
+                <div id="LO" class="p-2">
+                    <p><strong>LO: </strong><span id="LOStatus">-</span></p>
+                </div>
+                <div id="SOECard" class="p-2">
+                    <p><strong>SOE: </strong><span id="SOEStatus">-</span></p>
+                </div>
+                <div id="SODS" class="p-2">
+                    <p><strong>SODS: </strong><span id="SODSStatus">-</span></p>
                 </div>
             </div>
         </div>
@@ -39,14 +52,14 @@
                     $.get("../figures/temperature", function(data) {
                         $("#plot1").html(`<img src="data:image/png;base64,${data}" class="figure-img img-fluid rounded">`);
                     });
-                    $.get("../figures/pressure", function(data) {
-                        $("#plot2").html(`<img src="data:image/png;base64,${data}" class="figure-img img-fluid rounded">`);
-                    });
                     $.get("../status", function(data) {
                         setMotorStatus("#motorStatus", data.motor_speed);
                         setSoundCardStatus("#soundCardStatus", data.sound_card_status);
                         setCameraStatus("#cameraStatus", data.camera_status);
-                        setHeaterStatus("#heaterStatus", data.heater_status);
+                        setLOStatus("#LOStatus", data.LO_status);
+                        setSOEStatus("#SOEStatus", data.SOE_status);
+                        setSODSStatus("#SODSStatus", data.SODS_status);
+                        setErrors("#errors", data.errors);
                     });
                 }, 500); // twice per second
             } else {
