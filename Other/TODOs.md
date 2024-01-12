@@ -8,6 +8,7 @@
   - [X] "Health" monitoring indicators (e.g. power is received, camera is on/off, LEDs are on/off, …) to indicate that the experiment is working properly.
   - [X] Indicators showing which rocket signals (LO, SODS, SOE) have been received.
 - [X] Add a Receiver that runs on the ground station and receives the data from the rocket.
+- [ ] Map the received data to database entries.
 
 
 ## Rocket
