@@ -46,7 +46,7 @@ async def run_telecoms_cycle(starting_time: float):
 
             await asyncio.sleep(0.3)  # 3 times per second
 
-            if time.perf_counter() - starting_time > TimelineEnum.SODS_OFF.get_adapted_value:
+            if time.perf_counter() - starting_time > TimelineEnum.SODS_OFF.adapted_value:
                 logging.info("Stopping the telecoms cycle...")
                 break
 

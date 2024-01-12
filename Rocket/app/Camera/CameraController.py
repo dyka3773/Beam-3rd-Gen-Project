@@ -24,7 +24,7 @@ async def run_camera_cycle(starting_time: float):
     """
     logging.info("Starting camera cycle")
 
-    while (time.perf_counter() - starting_time < TimelineEnum.SODS_ON.get_adapted_value):
+    while (time.perf_counter() - starting_time < TimelineEnum.SODS_ON.adapted_value):
         await DataStorage().save_camera_status(0)
         logging.debug("Camera is OFF")
         await asyncio.sleep(0.3)
@@ -44,7 +44,7 @@ async def run_camera_cycle(starting_time: float):
         await DataStorage().save_camera_status(3)
         return
 
-    while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value):
+    while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.adapted_value):
         await DataStorage().save_camera_status(2)
         logging.debug("Camera is RECORDING")
         await asyncio.sleep(0.3)

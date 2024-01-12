@@ -22,7 +22,7 @@ async def run_rocket_signals_cycle(starting_time: float):
         starting_time (float): The time at which the program started.
     """
     logging.info("Starting rocket signals cycle")
-    while time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.get_adapted_value:
+    while time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.adapted_value:
         LO, SOE, SODS = signal_utils.get_signals()
         await DataStorage().save_signals(LO, SOE, SODS)
         logging.info(f"LO: {LO}, SOE: {SOE}, SODS: {SODS}")

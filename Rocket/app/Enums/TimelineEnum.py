@@ -15,5 +15,5 @@ class TimelineEnum(Enum):
     START_OF_MICROGRAVITY = 72
 
     @property
-    def get_adapted_value(self):
+    def adapted_value(self):
         return self.value + 600
