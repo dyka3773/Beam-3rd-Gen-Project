@@ -1,9 +1,9 @@
 import Jetson.GPIO as GPIO
 import time
 
-LO_pin = 11
-SOE_pin = 13
-SODS_pin = 15
+LO_pin = 21
+SOE_pin = 15
+SODS_pin = 11
 
 GPIO.setmode(GPIO.BOARD)
 
@@ -25,8 +25,8 @@ def get_status_of_signal(signal):
 
 
 while True:
-    print(f"LO: {get_status_of_signal(11)}")
-    print(f"SOE: {get_status_of_signal(13)}")
-    print(f"SODS: {get_status_of_signal(15)}")
+    print(f"LO: {get_status_of_signal(LO_pin)}")
+    print(f"SOE: {get_status_of_signal(SOE_pin)}")
+    print(f"SODS: {get_status_of_signal(SODS_pin)}")
     print()
     time.sleep(1)
