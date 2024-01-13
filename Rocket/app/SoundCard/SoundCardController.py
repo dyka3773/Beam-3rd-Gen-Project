@@ -100,7 +100,7 @@ async def run_sound_card_cycle(starting_time: float):
             if signal_utils.get_status_of_signal(PinsEnum.LO):
                 await DataStorage().save_motor_speed(MotorSpeedsEnum.FULL_SPEED.value)
 
-                run_motor_for = TimelineEnum.SOE_OFF.value - TimelineEnum.START_MOTOR.value
+                run_motor_for = TimelineEnum.SOE_ON.value - TimelineEnum.START_MOTOR.value
 
                 # NOTE: This is the Electrical's PCB implementation
                 # threading.Thread(
