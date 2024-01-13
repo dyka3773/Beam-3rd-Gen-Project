@@ -6,7 +6,7 @@ from u3 import U3
 
 from Enums.TimelineEnum import TimelineEnum
 from DataStorage import DataStorage
-from SoundCard.motor_driver import run_motor_cycle
+from SoundCard.motor_driver import run_motor_cycle_labjack, run_motor_cycle
 from SoundCard.sound_card_driver import start_recording
 from Enums.MotorSpeedsEnum import MotorSpeedsEnum
 from Enums.PinsEnum import PinsEnum
@@ -102,9 +102,16 @@ async def run_sound_card_cycle(starting_time: float):
 
                 run_motor_for = TimelineEnum.SOE_OFF.value - TimelineEnum.START_MOTOR.value
 
+                # NOTE: This is the Electrical's PCB implementation
+                # threading.Thread(
+                #     target=run_motor_cycle_labjack,
+                #     args=(run_motor_for, card),
+                #     daemon=True
+                # ).start()
+
                 threading.Thread(
                     target=run_motor_cycle,
-                    args=(run_motor_for, card),
+                    args=(run_motor_for,),
                     daemon=True
                 ).start()
 

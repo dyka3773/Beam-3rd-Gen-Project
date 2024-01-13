@@ -11,7 +11,7 @@ class TimelineEnum(Enum):
     SOE_ON = 86     # Switch off the motor
     SOE_OFF = 191   # The end of microgravity
     LIFT_OFF = 0
-    START_MOTOR = 64
+    START_MOTOR = 66    # 64 in Electrical's PCB
     START_OF_MICROGRAVITY = 72
 
     @property

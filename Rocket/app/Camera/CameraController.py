@@ -6,6 +6,7 @@ import threading
 from Enums.TimelineEnum import TimelineEnum
 from DataStorage import DataStorage
 from Camera.camera_driver import start_recording
+import Camera.led_driver as led_driver
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,7 +30,11 @@ async def run_camera_cycle(starting_time: float):
         logging.debug("Camera is OFF")
         await asyncio.sleep(0.3)
 
-    # NOTE: With the current fps reach this will use about 1.1GB of storage
+    led_driver.turn_on_led()
+    logging.info("LEDS are ON")
+    # await DataStorage().save_led_status(1) # TODO: Implement this functionality
+
+    # NOTE: With the current fps reach this will use about 1.1GB of storage # IDK what timeline this followed
     #       This means that we can perform the full experiment cycle about 80 times before running out of storage
     record_for = TimelineEnum.SODS_OFF.value - TimelineEnum.SODS_ON.value
 

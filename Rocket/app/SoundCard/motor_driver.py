@@ -1,8 +1,10 @@
 import logging
 import u3
 import time
+import Jetson.GPIO as GPIO
 
 from Enums.MotorSpeedsEnum import MotorPWMSpeeds
+from Enums.PinsEnum import PinsEnum
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,7 +15,7 @@ logging.basicConfig(
 )
 
 
-def run_motor_cycle(run_for: float, device: u3.U3):
+def run_motor_cycle_labjack(run_for: float, device: u3.U3):
     """Runs the motor cycle.
 
     Args:
@@ -46,15 +48,40 @@ def run_motor_cycle(run_for: float, device: u3.U3):
     device.getFeedback(config(TimerMode=1, Value=MotorPWMSpeeds.STOP.value))
 
 
-def get_position() -> int:
-    """Returns the position of the piston.
+def run_motor_cycle(run_for: float):
+    """Runs the motor cycle.
 
-    Returns:
-        int: The position of the piston in mm.
+    Args:
+        run_for (float): The time to run the motor for.
     """
-    raise NotImplementedError('This function is not implemented yet.')
+    logging.info("Starting motor cycle")
+
+    GPIO.setmode(GPIO.BOARD)
+
+    GPIO.setup(PinsEnum.MOTOR_CONTROL.value, GPIO.OUT)
+
+    try:
+        turn_on_motor()
+        time.sleep(run_for)
+        turn_off_motor()
+    except Exception as e:
+        logging.error("An Error has occured in the LED Driver")
+        logging.error(e)
 
 
-def stop_motor_at_the_edge_of_the_cell():
-    """Stops the motor at the edge of the cell."""
-    raise NotImplementedError('This function is not implemented yet.')
+def turn_on_motor() -> None:
+    try:
+        GPIO.output(PinsEnum.MOTOR_CONTROL.value, GPIO.HIGH)
+    except Exception as e:
+        logging.error("An Error has occured in the LED Driver")
+        logging.error(e)
+        raise e
+
+
+def turn_off_motor() -> None:
+    try:
+        GPIO.output(PinsEnum.MOTOR_CONTROL.value, GPIO.LOW)
+    except Exception as e:
+        logging.error("An Error has occured in the LED Driver")
+        logging.error(e)
+        raise e
