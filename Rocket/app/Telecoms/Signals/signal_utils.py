@@ -46,9 +46,9 @@ def get_signals() -> tuple[bool, bool, bool]:
         tuple[bool, bool, bool]: A tuple containing the signals from the RXSM.
     """
     # NOTE: With Dimitris' PCB these should be inverted
-    LO_pin_state = GPIO.input(LO_pin) == GPIO.HIGH
-    SOE_pin_state = GPIO.input(SOE_pin) == GPIO.HIGH
-    SODS_pin_state = GPIO.input(SODS_pin) == GPIO.HIGH
+    LO_pin_state = GPIO.input(LO_pin) != GPIO.HIGH
+    SOE_pin_state = GPIO.input(SOE_pin) != GPIO.HIGH
+    SODS_pin_state = GPIO.input(SODS_pin) != GPIO.HIGH
 
     return LO_pin_state, SOE_pin_state, SODS_pin_state
 
@@ -62,4 +62,4 @@ def get_status_of_signal(signal: PinsEnum) -> bool:
     Returns:
         bool: The status of the given signal.
     """
-    return GPIO.input(signal.value) == GPIO.HIGH
+    return GPIO.input(signal.value) != GPIO.HIGH
