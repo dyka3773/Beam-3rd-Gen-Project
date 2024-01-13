@@ -11,13 +11,13 @@ logging.basicConfig(
     filemode='a'
 )
 
-GPIO.setmode(GPIO.BOARD)
-
-GPIO.setup(PinsEnum.LED_CONTROL.value, GPIO.OUT)
-
 
 def turn_on_led() -> None:
     try:
+        GPIO.setmode(GPIO.BOARD)
+
+        GPIO.setup(PinsEnum.LED_CONTROL.value, GPIO.OUT)
+
         GPIO.output(PinsEnum.LED_CONTROL.value, GPIO.HIGH)
     except Exception as e:
         logging.error("An Error has occured in the LED Driver")
