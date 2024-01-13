@@ -14,6 +14,8 @@ logging.basicConfig(
     filemode='a'
 )
 
+CURRENT_STATE = None
+
 
 def run_motor_cycle_labjack(run_for: float, device: u3.U3):
     """Runs the motor cycle.
@@ -60,18 +62,31 @@ def run_motor_cycle(run_for: float):
 
     GPIO.setup(PinsEnum.MOTOR_CONTROL.value, GPIO.OUT)
 
-    try:
+    time_passed = 0
+
+    while time_passed < run_for:
         turn_on_motor()
-        time.sleep(run_for)
-        turn_off_motor()
-    except Exception as e:
-        logging.error("An Error has occured in the LED Driver")
-        logging.error(e)
+        time.sleep(0.5)
+        if time_passed + 0.5 > run_for:
+            turn_off_motor()
+            break
+        time_passed += 0.5
+
+    turn_off_motor()
+
+    # try:
+    #     turn_on_motor()
+    #     time.sleep(run_for)
+    #     turn_off_motor()
+    # except Exception as e:
+    #     logging.error("An Error has occured in the LED Driver")
+    #     logging.error(e)
 
 
 def turn_on_motor() -> None:
     try:
         GPIO.output(PinsEnum.MOTOR_CONTROL.value, GPIO.HIGH)
+        CURRENT_STATE = GPIO.HIGH
     except Exception as e:
         logging.error("An Error has occured in the LED Driver")
         logging.error(e)
@@ -81,6 +96,7 @@ def turn_on_motor() -> None:
 def turn_off_motor() -> None:
     try:
         GPIO.output(PinsEnum.MOTOR_CONTROL.value, GPIO.LOW)
+        CURRENT_STATE = GPIO.LOW
     except Exception as e:
         logging.error("An Error has occured in the LED Driver")
         logging.error(e)
