@@ -103,17 +103,18 @@ async def run_sound_card_cycle(starting_time: float):
                 run_motor_for = TimelineEnum.SOE_ON.value - TimelineEnum.START_MOTOR.value
 
                 # NOTE: This is the Electrical's PCB implementation
-                # threading.Thread(
-                #     target=run_motor_cycle_labjack,
-                #     args=(run_motor_for, card),
-                #     daemon=True
-                # ).start()
-
                 threading.Thread(
-                    target=run_motor_cycle,
-                    args=(run_motor_for,),
+                    target=run_motor_cycle_labjack,
+                    args=(run_motor_for, card),
                     daemon=True
                 ).start()
+
+                # NOTE: This is the Jim's PCB implementation
+                # threading.Thread(
+                #     target=run_motor_cycle,
+                #     args=(run_motor_for,),
+                #     daemon=True
+                # ).start()
 
                 logging.info("Motor is ON and running at FULL_SPEED")
             else:
