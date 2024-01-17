@@ -42,13 +42,13 @@ function setSoundCardStatus(soundCard, status){
 }
 
 function setCameraStatus(camera, status){
-    if (status == false){
+    if (status == 0){
         $(camera).html("OFF")
         $(camera).removeClass()
         $(camera).addClass("text-danger")
     }
-    else if (status == true){
-        $(camera).html("ON")
+    else if (status == 2){
+        $(camera).html("RECORDING")
         $(camera).removeClass()
         $(camera).addClass("text-success")
     }

@@ -3,7 +3,7 @@ from functools import cache
 import serial
 import sqlite3 as sql
 
-port = "COM6"  # NOTE: This port may change depending on the computer
+port = "COM5"  # NOTE: This port may change depending on the computer
 
 
 def receive_data():
@@ -44,7 +44,12 @@ def deserialize_data(data: bytes) -> tuple:
     Returns:
         tuple: The deserialized data.
     """
-    return tuple(data.decode().split(','))
+    deserialized_data = data.decode().split(',')
+
+    def omit_none_values(x):
+        return x if x != 'None' else None
+
+    return tuple(map(omit_none_values, deserialized_data))
 
 
 def insert_data_in_db(data: tuple):
@@ -57,6 +62,7 @@ def insert_data_in_db(data: tuple):
         cursor = db.cursor()
         cursor.execute('''
             INSERT INTO GS_DATA (
+                time,
                 motor_speed,
                 sound_card_status,
                 camera_status,
@@ -67,7 +73,7 @@ def insert_data_in_db(data: tuple):
                 SOE_signal,
                 SODS_signal,
                 error_code
-            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', data)
         db.commit()
         logging.info(f'Inserted data: {data} in the database')
@@ -84,7 +90,7 @@ def create_db():
                 -- TODO: Add contraints in the values of the columns where needed
 
                 CREATE TABLE GS_DATA (
-                    time DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')),
+                    time DATETIME,
                     motor_speed INTEGER,        -- The speed of the motor in (rpm?)
                     sound_card_status INTEGER,  -- The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
                     camera_status INTEGER,      -- The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
@@ -95,9 +101,17 @@ def create_db():
                     LO_signal BOOLEAN,          -- The status of the LO signal. Possible values: 0 = OFF, 1 = ON
                     SOE_signal BOOLEAN,         -- The status of the SOE signal. Possible values: 0 = OFF, 1 = ON
                     SODS_signal BOOLEAN,        -- The status of the SODS signal. Possible values: 0 = OFF, 1 = ON
-                    error_code INTEGER,         -- The error code of the system in case of an error. Possible values: TBD
-                    PRIMARY KEY (time)
+                    error_code INTEGER          -- The error code of the system in case of an error. Possible values: TBD
                 );
             ''')
         db.commit()
         logging.info('Created table GS_data')
+
+
+'''
+-- This is the script to get the latest data from the database
+    SELECT TIME, MOTOR_SPEED, SOUND_CARD_STATUS, CAMERA_STATUS, TEMP_1, TEMP_2, TEMP_3, LO_SIGNAL, SOE_SIGNAL, SODS_SIGNAL, ERROR_CODE
+    FROM GS_DATA
+    ORDER BY TIME DESC
+    LIMIT 1;
+'''
