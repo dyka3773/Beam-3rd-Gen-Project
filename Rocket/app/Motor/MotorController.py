@@ -29,7 +29,7 @@ async def run_motor_cycle():
             break
 
         await DataStorage().save_motor_speed(0)
-        logging.debug("Motor is OFF")
+        logging.info("Motor is OFF")
         await asyncio.sleep(0.3)
 
     wait_for = TimelineEnum.START_MOTOR.value - TimelineEnum.LIFT_OFF.value
@@ -38,7 +38,7 @@ async def run_motor_cycle():
 
     while (time.perf_counter() - time_when_received_LO < wait_for):
         await DataStorage().save_motor_speed(0)
-        logging.debug("Motor is OFF")
+        logging.info("Motor is OFF")
         await asyncio.sleep(0.3)
 
     run_motor_for = TimelineEnum.SOE_ON.value - TimelineEnum.START_MOTOR.value
@@ -55,10 +55,10 @@ async def run_motor_cycle():
 
     while (time.perf_counter() - time_when_motor_started < run_motor_for):
         await DataStorage().save_motor_speed(1)
-        logging.debug("Motor is ON")
+        logging.info("Motor is ON")
         await asyncio.sleep(0.3)
 
     while (time.perf_counter() - time_when_received_LO < TimelineEnum.SODS_OFF.value):
         await DataStorage().save_motor_speed(0)
-        logging.debug("Motor is OFF")
+        logging.info("Motor is OFF")
         await asyncio.sleep(0.3)
