@@ -7,6 +7,7 @@ from Enums.TimelineEnum import TimelineEnum
 from Enums.PinsEnum import PinsEnum
 from DataStorage import DataStorage
 from Telecoms.Signals import signal_utils
+from Motor.motor_driver import run_motor
 
 
 logging.basicConfig(
@@ -45,7 +46,7 @@ async def run_motor_cycle():
     await DataStorage().save_motor_speed(1)
 
     threading.Thread(
-        target=run_motor_cycle,
+        target=run_motor,
         args=(run_motor_for,),
         daemon=True
     ).start()

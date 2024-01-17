@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 
 
-def run_motor_cycle(run_for: float):
+def run_motor(run_for: float):
     """Runs the motor cycle.
 
     Args:
