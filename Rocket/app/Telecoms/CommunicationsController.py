@@ -12,9 +12,6 @@ from Enums.TimelineEnum import TimelineEnum
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s',
-    filename='rocket.log',
-    encoding='utf-8',
-    filemode='a'
 )
 
 # Define the serial port and baud rate

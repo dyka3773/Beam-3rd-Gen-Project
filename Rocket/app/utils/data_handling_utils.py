@@ -7,9 +7,6 @@ from DataStorage import DataStorage
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s',
-    filename='rocket.log',
-    encoding='utf-8',
-    filemode='a'
 )
 
 logging.captureWarnings(True)

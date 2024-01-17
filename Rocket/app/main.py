@@ -1,3 +1,5 @@
+#! /home/dropstar/opt/python-3.10.13/bin/python
+
 import asyncio
 import logging
 import time
@@ -10,9 +12,6 @@ from Telecoms.SignalsController import run_rocket_signals_cycle
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s',
-    filename='rocket.log',
-    encoding='utf-8',
-    filemode='a'
 )
 
 
