@@ -15,16 +15,31 @@ logging.basicConfig(
 )
 
 
-async def run_rocket_signals_cycle(starting_time: float):
+async def run_rocket_signals_cycle():
     """Runs the rocket signals cycle.
-
-    Args:
-        starting_time (float): The time at which the program started.
     """
     logging.info("Starting rocket signals cycle")
-    while time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.adapted_value:
+
+    while True:
         LO, SOE, SODS = signal_utils.get_signals()
         await DataStorage().save_signals(LO, SOE, SODS)
         logging.info(f"LO: {LO}, SOE: {SOE}, SODS: {SODS}")
 
         await asyncio.sleep(0.3)
+
+        if LO == 1:
+            break
+
+    logging.info(
+        "Received LO signal so now we will continue working for 380 seconds")
+
+    time_when_received_LO = time.perf_counter()
+
+    while (time.perf_counter() - time_when_received_LO < TimelineEnum.SODS_OFF.value):
+        LO, SOE, SODS = signal_utils.get_signals()
+        await DataStorage().save_signals(LO, SOE, SODS)
+        logging.info(f"LO: {LO}, SOE: {SOE}, SODS: {SODS}")
+
+        await asyncio.sleep(0.3)
+
+    logging.info("Finished rocket signals cycle")

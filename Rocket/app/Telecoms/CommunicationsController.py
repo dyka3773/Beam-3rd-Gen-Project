@@ -8,6 +8,9 @@ from functools import cache
 from DataStorage import DataStorage
 from Enums.ErrorCodesEnum import ErrorCodesEnum
 from Enums.TimelineEnum import TimelineEnum
+from Enums.PinsEnum import PinsEnum
+import Telecoms.Signals.signal_utils as signal_utils
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -26,7 +29,7 @@ else:
     logging.info(f"Running on Jetson Nano and using {port}")
 
 
-async def run_telecoms_cycle(starting_time: float):
+async def run_telecoms_cycle():
     """Send and receive data from the serial port.
 
     Args:
@@ -35,24 +38,53 @@ async def run_telecoms_cycle(starting_time: float):
     _, writer = await open_serial_connection(url=port, baudrate=38400)
 
     try:
-        while True:
-            # Send the last saved data to the serial port
-            data_to_send = await DataStorage().get_last_row_of_all_data()
-            if data_to_send:
-                logging.info(f"Sending data: {data_to_send}")
-                writer.write(format_data_to_send(*data_to_send))
 
-            await writer.drain()
+        while True:
+            if signal_utils.get_status_of_signal(PinsEnum.LO):
+                break
+
+            data_to_send = await DataStorage().get_last_row_of_all_data()
+
+            try:
+                if data_to_send:
+                    logging.info(f"Sending data: {data_to_send}")
+                    writer.write(format_data_to_send(*data_to_send))
+
+                await writer.drain()
+
+            except Exception as e:
+                logging.error(f"Error in telecoms cycle: {e}")
+                await DataStorage().save_error_code(ErrorCodesEnum.CONNECTION_ERROR.value)
+                raise e
 
             await asyncio.sleep(0.3)  # 3 times per second
 
-            if time.perf_counter() - starting_time > TimelineEnum.SODS_OFF.adapted_value:
-                logging.info("Stopping the telecoms cycle...")
-                break
+        logging.info(
+            "Received LO signal so now we will continue working for 380 seconds")
 
-    except Exception as e:
-        logging.error(f"Error in telecoms cycle: {e}")
-        await DataStorage().save_error_code(ErrorCodesEnum.CONNECTION_ERROR.value)
+        time_when_received_LO = time.perf_counter()
+
+        while (time.perf_counter() - time_when_received_LO < TimelineEnum.SODS_OFF.value):
+            data_to_send = await DataStorage().get_last_row_of_all_data()
+
+            try:
+                if data_to_send:
+                    logging.info(f"Sending data: {data_to_send}")
+                    writer.write(format_data_to_send(*data_to_send))
+
+                await writer.drain()
+
+            except Exception as e:
+                logging.error(f"Error in telecoms cycle: {e}")
+                await DataStorage().save_error_code(ErrorCodesEnum.CONNECTION_ERROR.value)
+                raise e
+
+            await asyncio.sleep(0.3)  # 3 times per second
+
+    finally:
+        logging.info("Finished telecoms cycle")
+        writer.close()
+        await writer.wait_closed()
 
 
 @cache

@@ -46,9 +46,9 @@ class DataStorage:
 
                     CREATE TABLE ROCKET_DATA (
                         time DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')),
-                        motor_speed INTEGER,        -- The speed of the motor in (rpm?)
-                        sound_card_status INTEGER,  -- The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
-                        camera_status INTEGER,      -- The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
+                        motor_speed INTEGER,        -- The speed of the motor. Possible values: 0 = OFF, 1 = ON
+                        sound_card_status INTEGER,  -- The status of the sound card. Possible values: 0 = FINISHED, 1 = STANDBY, 2 = RECORDING, 3 = ERROR
+                        camera_status INTEGER,      -- The status of the camera. Possible values: 0 = FINISHED, 1 = STANDBY, 2 = RECORDING, 3 = ERROR
                         temp_1 REAL,                -- The temperature of the first sensor in (Celsius?)
                         temp_2 REAL,                -- The temperature of the second sensor in (Celsius?)
                         temp_3 REAL,                -- The temperature of the sound card sensor in (Kelvin)
@@ -57,6 +57,7 @@ class DataStorage:
                         SOE_signal BOOLEAN,         -- The status of the SOE signal. Possible values: 0 = OFF, 1 = ON
                         SODS_signal BOOLEAN,        -- The status of the SODS signal. Possible values: 0 = OFF, 1 = ON
                         error_code INTEGER,         -- The error code of the system in case of an error. Possible values: TBD
+                        led_status INTEGER,         -- The status of the LED. Possible values: 0 = OFF, 1 = ON
                         PRIMARY KEY (time)
                     );                   
                 ''')
@@ -147,6 +148,17 @@ class DataStorage:
             await sqlu.add_error_code(cursor, error_code)
             await db.commit()
 
+    async def save_led_status(self, led_status: int):
+        """Adds the status of the LED to the database.
+
+        Args:
+            led_status (int): The status of the LED. Possible values: 0 = OFF, 1 = ON
+        """
+        async with sql.connect(self.db_filename, timeout=10) as db:
+            cursor = await db.cursor()
+            await sqlu.add_led_status(cursor, led_status)
+            await db.commit()
+
     async def get_motor_speed(self) -> int | None:
         """Gets the speed of the motor from the database.
 
@@ -160,18 +172,6 @@ class DataStorage:
 
         return speed
 
-    async def motor_has_been_activated_before(self) -> bool:
-        """Checks if the motor has been activated before.
-
-        Returns:
-            bool: True if the motor has been activated before, False otherwise.
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            status = await sqlu.motor_has_been_activated_before(cursor)
-
-        return status
-
     async def get_sound_card_status(self) -> int | None:
         """Gets the status of the sound card from the database.
 
@@ -184,23 +184,6 @@ class DataStorage:
             await db.commit()
 
         return status
-
-    async def get_temp_of_sensor_for_the_last_x_secs(self, sensor_num: int, secs_ago: int = 1) -> Iterable[Row] | None:
-        """Gets the temperature of a specified sensor from the database.
-
-        Args:
-            sensor_num (int): The number of the sensor to get the temperature from.
-            secs_ago (int, optional): The number of seconds ago to get the temperature from. Defaults to 1.
-
-        Returns:
-            float: The temperature of the specified sensor.
-        """
-        async with sql.connect(self.db_filename, timeout=10) as db:
-            cursor = await db.cursor()
-            temp = await sqlu.get_temp_of_sensor_for_the_last_x_secs(cursor, sensor_num, secs_ago)
-            await db.commit()
-
-        return temp
 
     async def get_error_code(self) -> int | None:
         """Gets the error code of the system from the database.
