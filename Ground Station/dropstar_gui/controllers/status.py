@@ -169,3 +169,22 @@ async def get_errors() -> int | None:
             error_code = None
 
     return error_code
+
+
+async def get_led_status() -> int | None:
+    """Gets the led status from the db.
+
+    Returns:
+        int: The led status.
+    """
+    async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
+        result = db.execute(
+            'SELECT led_status FROM GS_data ORDER BY time DESC LIMIT 1')
+        status = await result
+        status = await status.fetchone()
+        try:
+            status = status[0]  # type: ignore
+        except TypeError:
+            status = None
+
+    return status

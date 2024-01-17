@@ -49,7 +49,17 @@ def deserialize_data(data: bytes) -> tuple:
     def omit_none_values(x):
         return x if x != 'None' else None
 
-    return tuple(map(omit_none_values, deserialized_data))
+    def omit_values_with_endline(x):
+        if x is None:
+            return x
+        if x.endswith('\n'):
+            return x[:-1]
+        return x
+
+    deserialized_data = map(omit_values_with_endline, deserialized_data)
+    deserialized_data = map(omit_none_values, deserialized_data)
+
+    return tuple(deserialized_data)
 
 
 def insert_data_in_db(data: tuple):
@@ -72,8 +82,9 @@ def insert_data_in_db(data: tuple):
                 LO_signal,
                 SOE_signal,
                 SODS_signal,
-                error_code
-            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                error_code,
+                led_status
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', data)
         db.commit()
         logging.info(f'Inserted data: {data} in the database')
@@ -91,9 +102,9 @@ def create_db():
 
                 CREATE TABLE GS_DATA (
                     time DATETIME,
-                    motor_speed INTEGER,        -- The speed of the motor in (rpm?)
-                    sound_card_status INTEGER,  -- The status of the sound card. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
-                    camera_status INTEGER,      -- The status of the camera. Possible values: 0 = OFF, 1 = ON, 2 = RECORDING, 3 = ERROR
+                    motor_speed INTEGER,        -- The speed of the motor. Possible values: 0 = OFF, 1 = ON
+                    sound_card_status INTEGER,  -- The status of the sound card. Possible values: 0 = FINISHED, 1 = STANDBY, 2 = RECORDING, 3 = ERROR
+                    camera_status INTEGER,      -- The status of the camera. Possible values: 0 = FINISHED, 1 = STANDBY, 2 = RECORDING, 3 = ERROR
                     temp_1 REAL,                -- The temperature of the first sensor in (Celsius?)
                     temp_2 REAL,                -- The temperature of the second sensor in (Celsius?)
                     temp_3 REAL,                -- The temperature of the sound card sensor in (Kelvin)
@@ -101,7 +112,8 @@ def create_db():
                     LO_signal BOOLEAN,          -- The status of the LO signal. Possible values: 0 = OFF, 1 = ON
                     SOE_signal BOOLEAN,         -- The status of the SOE signal. Possible values: 0 = OFF, 1 = ON
                     SODS_signal BOOLEAN,        -- The status of the SODS signal. Possible values: 0 = OFF, 1 = ON
-                    error_code INTEGER          -- The error code of the system in case of an error. Possible values: TBD
+                    error_code INTEGER,         -- The error code of the system in case of an error. Possible values: TBD
+                    led_status INTEGER         -- The status of the LED. Possible values: 0 = OFF, 1 = ON
                 );
             ''')
         db.commit()

@@ -1,18 +1,13 @@
-function setMotorStatus(motor, speed){
-    if (speed == 0){
-        $(motor).html(`Stopped \t\t (${speed})`)
+function setMotorStatus(motor, status){
+    if (status == 0){
+        $(motor).html("OFF")
         $(motor).removeClass()
         $(motor).addClass("text-danger")
     }
-    else if (speed == 255){
-        $(motor).html(`Max Speed \t\t (${speed})`)
+    else if (status == 1){
+        $(motor).html("ON")
         $(motor).removeClass()
         $(motor).addClass("text-success")
-    }
-    else if (speed > 0){
-        $(motor).html(`Speed Up \t\t (${speed})`)
-        $(motor).removeClass()
-        // $(motor).addClass("text-primary") // This is the default color which is blue
     }
     else {
         $(motor).html(`Error  \t\t (${speed})`)
@@ -23,13 +18,18 @@ function setMotorStatus(motor, speed){
 }
 
 function setSoundCardStatus(soundCard, status){
-    if (status == false){
-        $(soundCard).html("OFF")
+    if (status == 0){
+        $(soundCard).html("FINISHED")
         $(soundCard).removeClass()
         $(soundCard).addClass("text-danger")
     }
-    else if (status == true){
-        $(soundCard).html("ON")
+    else if (status == 1){
+        $(soundCard).html("ON / IVED OFF")
+        $(soundCard).removeClass()
+        $(soundCard).addClass("text-primary") // This is the default color which is blue
+    }
+    else if (status == 2){
+        $(soundCard).html("ON / IVED RECORDING")
         $(soundCard).removeClass()
         $(soundCard).addClass("text-success")
     }
@@ -43,9 +43,14 @@ function setSoundCardStatus(soundCard, status){
 
 function setCameraStatus(camera, status){
     if (status == 0){
-        $(camera).html("OFF")
+        $(camera).html("FINISHED")
         $(camera).removeClass()
         $(camera).addClass("text-danger")
+    }
+    else if (status == 1){
+        $(camera).html("ON / STANDBY")
+        $(camera).removeClass()
+        $(camera).addClass("text-primary")
     }
     else if (status == 2){
         $(camera).html("RECORDING")
@@ -57,6 +62,25 @@ function setCameraStatus(camera, status){
         $(camera).removeClass()
         $(camera).addClass("text-warning")
         $(camera).addClass("text-dark")
+    }
+}
+
+function setLEDStatus(led, status){
+    if (status == 0){
+        $(led).html("OFF")
+        $(led).removeClass()
+        $(led).addClass("text-danger")
+    }
+    else if (status == 1){
+        $(led).html("ON")
+        $(led).removeClass()
+        $(led).addClass("text-success")
+    }
+    else {
+        $(led).html(`Error  \t\t (${status})`)
+        $(led).removeClass()
+        $(led).addClass("text-warning")
+        $(led).addClass("text-dark")
     }
 }
 

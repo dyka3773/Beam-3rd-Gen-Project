@@ -49,14 +49,15 @@ async def status() -> Tuple[Mapping[str, str | int | None], int]:
         Returns a tuple containing the status and the HTTP status code.
     """
 
-    motor_speed, sound_card_status, camera_status, LO, SOE, SODS, error_code = await asyncio.gather(
+    motor_speed, sound_card_status, camera_status, LO, SOE, SODS, error_code, led_status = await asyncio.gather(
         experiment_status.get_motor_speed(),
         experiment_status.get_sound_card_status(),
         experiment_status.get_camera_status(),
         experiment_status.get_LO_signal(),
         experiment_status.get_SOE_signal(),
         experiment_status.get_SODS_signal(),
-        experiment_status.get_errors()
+        experiment_status.get_errors(),
+        experiment_status.get_led_status()
     )
 
     status = {
@@ -66,7 +67,8 @@ async def status() -> Tuple[Mapping[str, str | int | None], int]:
         'LO_status': LO,
         'SOE_status': SOE,
         'SODS_status': SODS,
-        'errors': error_code
+        'errors': error_code,
+        'led_status': led_status
     }
     return status, 200
 
