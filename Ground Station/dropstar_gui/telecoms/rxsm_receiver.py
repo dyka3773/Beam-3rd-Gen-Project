@@ -24,7 +24,10 @@ def receive_data():
             data = connection.readline()
             if data:
                 logging.info(f"Received data: {data}")
-                insert_data_in_db(deserialize_data(data))
+                try:
+                    insert_data_in_db(deserialize_data(data))
+                except Exception as e:
+                    logging.error(f"Error in inserting data: {e}")
 
                 data_has_been_received = True
             else:
@@ -58,8 +61,12 @@ def deserialize_data(data: bytes) -> tuple:
             return x[:-1]
         return x
 
-    deserialized_data = map(omit_values_with_endline, deserialized_data)
-    deserialized_data = map(omit_none_values, deserialized_data)
+    try:
+        deserialized_data = map(omit_values_with_endline, deserialized_data)
+        deserialized_data = map(omit_none_values, deserialized_data)
+    except Exception as e:
+        logging.error(f"Error in deserializing data: {e}")
+        raise e
 
     return tuple(deserialized_data)
 
@@ -72,8 +79,12 @@ def insert_data_in_db(data: tuple):
     """
     with sql.connect('GS_data.db', timeout=10) as db:
         cursor = db.cursor()
-        previous_row = get_previous_row_values(cursor)
-        coalesced_data = coalesce_data(data, previous_row)
+        try:
+            previous_row = get_previous_row_values(cursor)
+            coalesced_data = coalesce_data(data, previous_row)
+        except Exception as e:
+            logging.error(f"Error in coalescing data: {e}")
+            raise e
         cursor.execute('''
             INSERT INTO GS_DATA (
                 time,
@@ -122,12 +133,3 @@ def create_db():
             ''')
         db.commit()
         logging.info('Created table GS_data')
-
-
-'''
--- This is the script to get the latest data from the database
-    SELECT TIME, MOTOR_SPEED, SOUND_CARD_STATUS, CAMERA_STATUS, TEMP_1, TEMP_2, TEMP_3, LO_SIGNAL, SOE_SIGNAL, SODS_SIGNAL, ERROR_CODE
-    FROM GS_DATA
-    ORDER BY TIME DESC
-    LIMIT 1;
-'''
