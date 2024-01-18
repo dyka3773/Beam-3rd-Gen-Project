@@ -1,7 +1,6 @@
 import aiosqlite as sql
 import logging
-
-from utils.thermistor_util import convert_thermistor_values
+import datetime
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -59,7 +58,7 @@ async def get_camera_status() -> bool:
     return status
 
 
-async def get_temperature(sensor: str, time: int) -> list[float]:
+async def get_temperature(sensor: str, time: int) -> tuple[list[int], list[float]]:
     """Gets the temperature from the db.
 
     Args:
@@ -67,7 +66,7 @@ async def get_temperature(sensor: str, time: int) -> list[float]:
         time (int): The time for which the temperature will be read.
 
     Returns:
-        list: The temperature values for the given time.
+        tuple[list[float], list[float]]: A list of tuples containing the time and temperature.
     """
     async with sql.connect('file:GS_data.db?mode=ro', timeout=10, isolation_level=None, uri=True) as db:
         if sensor == 'sensor1':
@@ -79,25 +78,41 @@ async def get_temperature(sensor: str, time: int) -> list[float]:
         else:
             raise ValueError('Invalid sensor name')
 
-        results = await db.execute(f'''SELECT {col}
+        # This query gets the last 180 temperature readings which we assume is about 1 minute of data because we have 3.3 Hz sampling rate
+        results = await db.execute(f'''SELECT time, {col}
                                         FROM GS_data
-                                        WHERE time >= DATETIME('now', '-{time} seconds')
+                                        WHERE {col} IS NOT NULL
                                         ORDER BY time DESC
+                                        LIMIT 180
                                 ''')
-        temperature = await results.fetchall()
+        time_to_temperature = await results.fetchall()  # This is a list of tuples
 
-    temp_list: list[float] = [x for (x,) in temperature]
-    temp_list.reverse()
+    # I need to convert the list of tuples into a tuple of lists
+    # I think this is returning a tuple of tuples instead of a tuple of lists but I'm not sure
+    temp_tuple = tuple(zip(*time_to_temperature))
+    if len(temp_tuple) == 0:
+        return ([], [])
 
-    if sensor != 'sensor3':
-        temp_list = list(map(convert_thermistor_values, temp_list))
+    temp_tuple = (list(temp_tuple[0]), list(temp_tuple[1]))
 
-    logging.debug(f'Got temperature: {temp_list}')
+    # I need to reverse the lists so that the time is in ascending order
+    temp_tuple[0].reverse()
+    temp_tuple[1].reverse()
 
-    if len(temp_list) == 0:
-        temp_list = [-1]
+    returned_times = []
+    returned_temps = []
 
-    return temp_list
+    for time_before_format, temp in zip(temp_tuple[0], temp_tuple[1]):
+        formated_time = datetime.datetime.strptime(
+            time_before_format, '%Y-%m-%d %H:%M:%S.%f')
+        returned_times.append(formated_time)
+        returned_temps.append(temp)
+
+    temp_tuple = (returned_times, returned_temps)
+
+    logging.debug(f'Got times: {temp_tuple[0]}')
+    logging.debug(f'Got temperatures: {temp_tuple[1]}')
+    return temp_tuple  # type: ignore
 
 
 async def get_LO_signal() -> bool:

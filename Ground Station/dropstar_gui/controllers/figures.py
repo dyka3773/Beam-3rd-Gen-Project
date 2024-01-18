@@ -1,8 +1,7 @@
-from cProfile import label
 import io
-import numpy as np
 import matplotlib
 import asyncio
+import logging
 
 from matplotlib import pyplot as plt
 
@@ -11,6 +10,8 @@ from .status import get_temperature
 
 matplotlib.use('agg')
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 FIGURES = ["temperature", "pressure"]
 
@@ -23,25 +24,25 @@ async def get_temp_plot(img: io.BytesIO) -> None:
     """
     time_range_of_plot = 60  # This value determines the time range of the plot
 
-    sensor1, sensor2, sensor3 = await asyncio.gather(
+    sensor1_data, sensor2_data, sensor3_data = await asyncio.gather(
         get_temperature("sensor1", time_range_of_plot),
         get_temperature("sensor2", time_range_of_plot),
         get_temperature("sensor3", time_range_of_plot)
     )
 
-    # FIXME: This can probably be done in one line for every sensor so that we don't have to repeat the code
-    x_1 = [i/3 for i in range(len(sensor1))]
-    x_2 = [i/3 for i in range(len(sensor2))]
-    x_3 = [i/3 for i in range(len(sensor3))]
-
     figure, ax = plt.subplots()
 
-    ax.plot(x_1, sensor1, label="Sensor 1")
-    ax.plot(x_2, sensor2, label="Sensor 2")
-    ax.plot(x_3, sensor3, label="Sensor 3")
+    logging.debug(f"Sensor 1 data: {sensor1_data}")
+    logging.debug(f"Sensor 2 data: {sensor2_data}")
+    logging.debug(f"Sensor 3 data: {sensor3_data}")
+
+    ax.plot(*sensor1_data, label="Sensor 1")
+    ax.plot(*sensor2_data, label="Sensor 2")
+    ax.plot(*sensor3_data, label="Sound Card")
     ax.set_title("Temperature Plot")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Temperature (C)")
+    ax.legend()
     ax.grid()
     figure.savefig(img, format='png')
     plt.close(figure)

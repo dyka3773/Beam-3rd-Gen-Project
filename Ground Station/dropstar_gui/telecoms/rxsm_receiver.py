@@ -77,6 +77,8 @@ def insert_data_in_db(data: tuple):
     Args:
         data (tuple): The data to be inserted into the database.
     """
+    data = format_data(data)
+
     with sql.connect('GS_data.db', timeout=10) as db:
         cursor = db.cursor()
         try:
@@ -88,7 +90,6 @@ def insert_data_in_db(data: tuple):
             logging.error(f"Error in coalescing data: {e}")
             raise e
 
-        coalesced_data = format_data(coalesced_data)
         cursor.execute('''
             INSERT INTO GS_DATA (
                 time,
