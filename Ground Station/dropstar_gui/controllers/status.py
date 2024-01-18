@@ -1,6 +1,8 @@
 import aiosqlite as sql
 import logging
 
+from utils.thermistor_util import convert_thermistor_values
+
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -57,7 +59,7 @@ async def get_camera_status() -> bool:
     return status
 
 
-async def get_temperature(sensor: str, time: int) -> list[int]:
+async def get_temperature(sensor: str, time: int) -> list[float]:
     """Gets the temperature from the db.
 
     Args:
@@ -84,8 +86,11 @@ async def get_temperature(sensor: str, time: int) -> list[int]:
                                 ''')
         temperature = await results.fetchall()
 
-    temp_list = [x for (x,) in temperature]
+    temp_list: list[float] = [x for (x,) in temperature]
     temp_list.reverse()
+
+    if sensor != 'sensor3':
+        temp_list = list(map(convert_thermistor_values, temp_list))
 
     logging.debug(f'Got temperature: {temp_list}')
 
