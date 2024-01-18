@@ -63,16 +63,16 @@ def format_data(data: Tuple) -> Tuple:
         return x
 
     return (
-        data[0],
-        int(data[1]),
-        int(data[2]),
-        int(data[3]),
-        float(data[4]),
-        float(data[5]),
-        float(data[6]),
-        format_signals(data[7]),
-        format_signals(data[8]),
-        format_signals(data[9]),
-        int(data[10]),
-        int(data[11]),
+        data[0] if data[0] is not None else None,
+        int(data[1]) if data[1] is not None else None,
+        int(data[2]) if data[2] is not None else None,
+        int(data[3]) if data[3] is not None else None,
+        float(data[4]) if data[4] is not None else None,
+        float(data[5]) if data[5] is not None else None,
+        float(data[6]) if data[6] is not None else None,
+        format_signals(data[7]) if data[7] is not None else None,
+        format_signals(data[8]) if data[8] is not None else None,
+        format_signals(data[9]) if data[9] is not None else None,
+        int(data[10]) if data[10] is not None else None,
+        int(data[11]) if data[11] is not None else None,
     )
