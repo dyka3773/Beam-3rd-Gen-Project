@@ -34,7 +34,8 @@ def receive_data():
                 if not data_has_been_received:
                     logging.warning(
                         "No data received. Experiment is probably still off or there is something wrong in the connection...")
-                logging.debug("No data received")
+                    continue
+                logging.warning("No data received")
         except Exception as e:
             logging.error(f"Error in receiving data: {e}")
 
