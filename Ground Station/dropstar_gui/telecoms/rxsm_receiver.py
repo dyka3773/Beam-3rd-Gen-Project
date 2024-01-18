@@ -3,6 +3,8 @@ from functools import cache
 import serial
 import sqlite3 as sql
 
+from telecoms.telecom_util import coalesce_data, get_previous_row_values
+
 port = "COM5"  # NOTE: This port may change depending on the computer
 
 
@@ -70,6 +72,8 @@ def insert_data_in_db(data: tuple):
     """
     with sql.connect('GS_data.db', timeout=10) as db:
         cursor = db.cursor()
+        previous_row = get_previous_row_values(cursor)
+        coalesced_data = coalesce_data(data, previous_row)
         cursor.execute('''
             INSERT INTO GS_DATA (
                 time,
@@ -85,9 +89,9 @@ def insert_data_in_db(data: tuple):
                 error_code,
                 led_status
             ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', data)
+        ''', coalesced_data)
         db.commit()
-        logging.info(f'Inserted data: {data} in the database')
+        logging.info(f'Inserted data: {coalesced_data} in the database')
 
 
 def create_db():
