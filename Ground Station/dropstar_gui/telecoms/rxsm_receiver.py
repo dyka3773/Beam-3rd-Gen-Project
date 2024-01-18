@@ -81,6 +81,8 @@ def insert_data_in_db(data: tuple):
         cursor = db.cursor()
         try:
             previous_row = get_previous_row_values(cursor)
+            if len(previous_row) == 0:
+                previous_row = (None,)*len(data)
             coalesced_data = coalesce_data(data, previous_row)
         except Exception as e:
             logging.error(f"Error in coalescing data: {e}")
