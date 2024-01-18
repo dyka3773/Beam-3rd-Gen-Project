@@ -108,6 +108,8 @@ async def run_sound_card_cycle():
         await DataStorage().save_temperature_of_sensor(temperature_of_thermistor1, 1)
         await DataStorage().save_temperature_of_sensor(temperature_of_thermistor2, 2)
 
+        await DataStorage().save_sound_card_status(2)
+
         await asyncio.sleep(0.3)
 
     await DataStorage().save_sound_card_status(0)
