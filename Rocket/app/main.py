@@ -1,3 +1,5 @@
+#! /home/dropstar/opt/python-3.10.13/bin/python
+
 import asyncio
 import logging
 
