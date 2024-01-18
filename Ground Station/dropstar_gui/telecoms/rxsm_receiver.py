@@ -17,8 +17,8 @@ def receive_data():
 
     data_has_been_received = False
 
-    try:
-        while True:
+    while True:
+        try:
             data = connection.readline()
             if data:
                 logging.info(f"Received data: {data}")
@@ -30,8 +30,8 @@ def receive_data():
                     logging.warning(
                         "No data received. Experiment is probably still off or there is something wrong in the connection...")
                 logging.debug("No data received")
-    except Exception as e:
-        logging.error(f"Error in receiving data: {e}")
+        except Exception as e:
+            logging.error(f"Error in receiving data: {e}")
 
 
 @cache
