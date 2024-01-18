@@ -60,9 +60,9 @@
                         setSoundCardStatus("#soundCardStatus", data.sound_card_status);
                         setCameraStatus("#cameraStatus", data.camera_status);
                         setLEDStatus("#ledStatus", data.led_status);
-                        setLOStatus("#LOStatus", data.LO_status);
-                        setSOEStatus("#SOEStatus", data.SOE_status);
-                        setSODSStatus("#SODSStatus", data.SODS_status);
+                        setSignalStatus("#LOStatus", data.LO_status);
+                        setSignalStatus("#SOEStatus", data.SOE_status);
+                        setSignalStatus("#SODSStatus", data.SODS_status);
                         setErrors("#errors", data.errors);
                     });
                 }, 500); // twice per second

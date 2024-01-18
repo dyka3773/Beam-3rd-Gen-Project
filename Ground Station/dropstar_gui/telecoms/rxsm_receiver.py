@@ -3,7 +3,7 @@ from functools import cache
 import serial
 import sqlite3 as sql
 
-from telecoms.telecom_util import coalesce_data, get_previous_row_values
+from telecoms.telecom_util import coalesce_data, get_previous_row_values, format_data
 
 port = "COM5"  # NOTE: This port may change depending on the computer
 
@@ -87,6 +87,8 @@ def insert_data_in_db(data: tuple):
         except Exception as e:
             logging.error(f"Error in coalescing data: {e}")
             raise e
+
+        coalesced_data = format_data(coalesced_data)
         cursor.execute('''
             INSERT INTO GS_DATA (
                 time,
@@ -125,7 +127,6 @@ def create_db():
                     temp_1 REAL,                -- The temperature of the first sensor in (Celsius?)
                     temp_2 REAL,                -- The temperature of the second sensor in (Celsius?)
                     temp_3 REAL,                -- The temperature of the sound card sensor in (Kelvin)
-                    -- Add sensors here if needed
                     LO_signal BOOLEAN,          -- The status of the LO signal. Possible values: 0 = OFF, 1 = ON
                     SOE_signal BOOLEAN,         -- The status of the SOE signal. Possible values: 0 = OFF, 1 = ON
                     SODS_signal BOOLEAN,        -- The status of the SODS signal. Possible values: 0 = OFF, 1 = ON

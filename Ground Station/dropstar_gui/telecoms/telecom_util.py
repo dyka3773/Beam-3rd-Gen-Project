@@ -42,3 +42,37 @@ def get_previous_row_values(cursor: sql.Cursor) -> Tuple:
         return ()
 
     return previous_row
+
+
+def format_data(data: Tuple) -> Tuple:
+    """Formats the data into their proper type.
+
+    Args:
+        data (Tuple): The data to be formatted.
+
+    Returns:
+        Tuple: The formatted data.
+    """
+    def format_signals(x):
+        if x is None:
+            return x
+        if x == 0 or x == '0':
+            return False
+        if x == 1 or x == '1':
+            return True
+        return x
+
+    return (
+        data[0],
+        int(data[1]),
+        int(data[2]),
+        int(data[3]),
+        float(data[4]),
+        float(data[5]),
+        float(data[6]),
+        format_signals(data[7]),
+        format_signals(data[8]),
+        format_signals(data[9]),
+        int(data[10]),
+        int(data[11]),
+    )

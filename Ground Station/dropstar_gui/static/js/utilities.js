@@ -10,7 +10,7 @@ function setMotorStatus(motor, status){
         $(motor).addClass("text-success")
     }
     else {
-        $(motor).html(`Error  \t\t (${speed})`)
+        $(motor).html(`Error  \t\t (${status})`)
         $(motor).removeClass()
         $(motor).addClass("text-warning")
         $(motor).addClass("text-dark")
@@ -84,60 +84,22 @@ function setLEDStatus(led, status){
     }
 }
 
-function setLOStatus(lo, status){
+function setSignalStatus(element, status){
     if (status == false){
-        $(lo).html("OFF")
-        $(lo).removeClass()
-        $(lo).addClass("text-danger")
+        $(element).html("OFF")
+        $(element).removeClass()
+        $(element).addClass("text-danger")
     }
     else if (status == true){
-        $(lo).html("ON")
-        $(lo).removeClass()
-        $(lo).addClass("text-success")
+        $(element).html("ON")
+        $(element).removeClass()
+        $(element).addClass("text-success")
     }
     else {
-        $(lo).html(`Error  \t\t (${status})`)
-        $(lo).removeClass()
-        $(lo).addClass("text-warning")
-        $(lo).addClass("text-dark")
-    }
-}
-
-function setSOEStatus(soe, status){
-    if (status == false){
-        $(soe).html("OFF")
-        $(soe).removeClass()
-        $(soe).addClass("text-danger")
-    }
-    else if (status == true){
-        $(soe).html("ON")
-        $(soe).removeClass()
-        $(soe).addClass("text-success")
-    }
-    else {
-        $(soe).html(`Error  \t\t (${status})`)
-        $(soe).removeClass()
-        $(soe).addClass("text-warning")
-        $(soe).addClass("text-dark")
-    }
-}
-
-function setSODSStatus(sods, status){
-    if (status == false){
-        $(sods).html("OFF")
-        $(sods).removeClass()
-        $(sods).addClass("text-danger")
-    }
-    else if (status == true){
-        $(sods).html("ON")
-        $(sods).removeClass()
-        $(sods).addClass("text-success")
-    }
-    else {
-        $(sods).html(`Error  \t\t (${status})`)
-        $(sods).removeClass()
-        $(sods).addClass("text-warning")
-        $(sods).addClass("text-dark")
+        $(element).html(`Error  \t\t (${status})`)
+        $(element).removeClass()
+        $(element).addClass("text-warning")
+        $(element).addClass("text-dark")
     }
 }
 

@@ -30,12 +30,16 @@ async def run_camera_cycle():
             break
 
         await DataStorage().save_camera_status(1)
-        logging.debug("Camera is on STANDBY")
+        logging.info("Camera is on STANDBY")
+
+        logging.info("LEDS are OFF")
+        await DataStorage().save_led_status(0)
+
         await asyncio.sleep(0.3)
 
     led_driver.turn_on_led()
     logging.info("LEDS are ON")
-    # await DataStorage().save_led_status(1) # TODO: Implement this functionality
+    await DataStorage().save_led_status(1)
 
     # NOTE: With the current fps reach this will use about 1.1GB of storage # IDK what timeline this followed
     #       This means that we can perform the full experiment cycle about 80 times before running out of storage
@@ -56,7 +60,11 @@ async def run_camera_cycle():
 
     while (time.perf_counter() - time_when_started_recording < record_for):
         await DataStorage().save_camera_status(2)
-        logging.debug("Camera is RECORDING")
+        logging.info("Camera is RECORDING")
+
+        logging.info("LEDS are ON")
+        await DataStorage().save_led_status(1)
+
         await asyncio.sleep(0.3)
 
     await DataStorage().save_camera_status(0)
