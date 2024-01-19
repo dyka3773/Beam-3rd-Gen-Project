@@ -36,8 +36,8 @@ async def get_temp_plot(img: io.BytesIO) -> None:
     logging.debug(f"Sensor 2 data: {sensor2_data}")
     logging.debug(f"Sensor 3 data: {sensor3_data}")
 
-    ax.plot(*sensor1_data, label="Sensor 1")
-    ax.plot(*sensor2_data, label="Sensor 2")
+    ax.plot(*sensor1_data, label="Right Sensor")
+    ax.plot(*sensor2_data, label="Left Sensor")
     ax.plot(*sensor3_data, label="Sound Card")
     ax.set_title("Temperature Plot")
     ax.set_xlabel("Time (s)")
