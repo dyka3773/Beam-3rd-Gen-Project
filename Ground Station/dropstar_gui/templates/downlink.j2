@@ -15,6 +15,9 @@
                 <div id="camera" class="p-2">
                     <p><strong>Camera: </strong><span id="cameraStatus">-</span></p>
                 </div>
+                <div id="led" class="p-2">
+                    <p><strong>LEDs: </strong><span id="ledStatus">-</span></p>
+                </div>
                 <div id="errorsCodes" class="p-2">
                     <p><strong>Error Code: </strong><span id="errors">-</span></p>
                 </div>
@@ -56,9 +59,10 @@
                         setMotorStatus("#motorStatus", data.motor_speed);
                         setSoundCardStatus("#soundCardStatus", data.sound_card_status);
                         setCameraStatus("#cameraStatus", data.camera_status);
-                        setLOStatus("#LOStatus", data.LO_status);
-                        setSOEStatus("#SOEStatus", data.SOE_status);
-                        setSODSStatus("#SODSStatus", data.SODS_status);
+                        setLEDStatus("#ledStatus", data.led_status);
+                        setSignalStatus("#LOStatus", data.LO_status);
+                        setSignalStatus("#SOEStatus", data.SOE_status);
+                        setSignalStatus("#SODSStatus", data.SODS_status);
                         setErrors("#errors", data.errors);
                     });
                 }, 500); // twice per second

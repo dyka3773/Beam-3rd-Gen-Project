@@ -1,21 +1,16 @@
-function setMotorStatus(motor, speed){
-    if (speed == 0){
-        $(motor).html(`Stopped \t\t (${speed})`)
+function setMotorStatus(motor, status){
+    if (status == 0){
+        $(motor).html("OFF")
         $(motor).removeClass()
         $(motor).addClass("text-danger")
     }
-    else if (speed == 255){
-        $(motor).html(`Max Speed \t\t (${speed})`)
+    else if (status == 1){
+        $(motor).html("ON")
         $(motor).removeClass()
         $(motor).addClass("text-success")
     }
-    else if (speed > 0){
-        $(motor).html(`Speed Up \t\t (${speed})`)
-        $(motor).removeClass()
-        // $(motor).addClass("text-primary") // This is the default color which is blue
-    }
     else {
-        $(motor).html(`Error  \t\t (${speed})`)
+        $(motor).html(`Error  \t\t (${status})`)
         $(motor).removeClass()
         $(motor).addClass("text-warning")
         $(motor).addClass("text-dark")
@@ -23,13 +18,18 @@ function setMotorStatus(motor, speed){
 }
 
 function setSoundCardStatus(soundCard, status){
-    if (status == false){
-        $(soundCard).html("OFF")
+    if (status == 0){
+        $(soundCard).html("FINISHED")
         $(soundCard).removeClass()
         $(soundCard).addClass("text-danger")
     }
-    else if (status == true){
-        $(soundCard).html("ON")
+    else if (status == 1){
+        $(soundCard).html("ON / IVED OFF")
+        $(soundCard).removeClass()
+        $(soundCard).addClass("text-primary") // This is the default color which is blue
+    }
+    else if (status == 2){
+        $(soundCard).html("ON / IVED RECORDING")
         $(soundCard).removeClass()
         $(soundCard).addClass("text-success")
     }
@@ -42,13 +42,18 @@ function setSoundCardStatus(soundCard, status){
 }
 
 function setCameraStatus(camera, status){
-    if (status == false){
-        $(camera).html("OFF")
+    if (status == 0){
+        $(camera).html("FINISHED")
         $(camera).removeClass()
         $(camera).addClass("text-danger")
     }
-    else if (status == true){
-        $(camera).html("ON")
+    else if (status == 1){
+        $(camera).html("ON / STANDBY")
+        $(camera).removeClass()
+        $(camera).addClass("text-primary")
+    }
+    else if (status == 2){
+        $(camera).html("RECORDING")
         $(camera).removeClass()
         $(camera).addClass("text-success")
     }
@@ -60,60 +65,41 @@ function setCameraStatus(camera, status){
     }
 }
 
-function setLOStatus(lo, status){
-    if (status == false){
-        $(lo).html("OFF")
-        $(lo).removeClass()
-        $(lo).addClass("text-danger")
+function setLEDStatus(led, status){
+    if (status == 0){
+        $(led).html("OFF")
+        $(led).removeClass()
+        $(led).addClass("text-danger")
     }
-    else if (status == true){
-        $(lo).html("ON")
-        $(lo).removeClass()
-        $(lo).addClass("text-success")
+    else if (status == 1){
+        $(led).html("ON")
+        $(led).removeClass()
+        $(led).addClass("text-success")
     }
     else {
-        $(lo).html(`Error  \t\t (${status})`)
-        $(lo).removeClass()
-        $(lo).addClass("text-warning")
-        $(lo).addClass("text-dark")
+        $(led).html(`Error  \t\t (${status})`)
+        $(led).removeClass()
+        $(led).addClass("text-warning")
+        $(led).addClass("text-dark")
     }
 }
 
-function setSOEStatus(soe, status){
+function setSignalStatus(element, status){
     if (status == false){
-        $(soe).html("OFF")
-        $(soe).removeClass()
-        $(soe).addClass("text-danger")
+        $(element).html("OFF")
+        $(element).removeClass()
+        $(element).addClass("text-danger")
     }
     else if (status == true){
-        $(soe).html("ON")
-        $(soe).removeClass()
-        $(soe).addClass("text-success")
+        $(element).html("ON")
+        $(element).removeClass()
+        $(element).addClass("text-success")
     }
     else {
-        $(soe).html(`Error  \t\t (${status})`)
-        $(soe).removeClass()
-        $(soe).addClass("text-warning")
-        $(soe).addClass("text-dark")
-    }
-}
-
-function setSODSStatus(sods, status){
-    if (status == false){
-        $(sods).html("OFF")
-        $(sods).removeClass()
-        $(sods).addClass("text-danger")
-    }
-    else if (status == true){
-        $(sods).html("ON")
-        $(sods).removeClass()
-        $(sods).addClass("text-success")
-    }
-    else {
-        $(sods).html(`Error  \t\t (${status})`)
-        $(sods).removeClass()
-        $(sods).addClass("text-warning")
-        $(sods).addClass("text-dark")
+        $(element).html(`Error  \t\t (${status})`)
+        $(element).removeClass()
+        $(element).addClass("text-warning")
+        $(element).addClass("text-dark")
     }
 }
 

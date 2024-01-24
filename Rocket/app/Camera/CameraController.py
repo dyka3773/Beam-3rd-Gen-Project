@@ -4,9 +4,12 @@ import logging
 import threading
 
 from Enums.TimelineEnum import TimelineEnum
+from Enums.PinsEnum import PinsEnum
 from DataStorage import DataStorage
 from Camera.camera_driver import start_recording
 import Camera.led_driver as led_driver
+from Telecoms.Signals import signal_utils
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,26 +17,32 @@ logging.basicConfig(
 )
 
 
-async def run_camera_cycle(starting_time: float):
+async def run_camera_cycle():
     """Runs the camera cycle according to the timeline.
-
-    Args:
-        starting_time (float): The time at which the program started.
     """
     logging.info("Starting camera cycle")
 
-    while (time.perf_counter() - starting_time < TimelineEnum.SODS_ON.adapted_value):
-        await DataStorage().save_camera_status(0)
-        logging.debug("Camera is OFF")
+    while True:
+        if signal_utils.get_status_of_signal(PinsEnum.SODS):
+            break
+
+        await DataStorage().save_camera_status(1)
+        logging.info("Camera is on STANDBY")
+
+        logging.info("LEDS are OFF")
+        await DataStorage().save_led_status(0)
+
         await asyncio.sleep(0.3)
 
     led_driver.turn_on_led()
     logging.info("LEDS are ON")
-    # await DataStorage().save_led_status(1) # TODO: Implement this functionality
+    await DataStorage().save_led_status(1)
 
     # NOTE: With the current fps reach this will use about 1.1GB of storage # IDK what timeline this followed
     #       This means that we can perform the full experiment cycle about 80 times before running out of storage
     record_for = TimelineEnum.SODS_OFF.value - TimelineEnum.SODS_ON.value
+
+    time_when_started_recording = time.perf_counter()
 
     try:
         threading.Thread(
@@ -46,10 +55,15 @@ async def run_camera_cycle(starting_time: float):
         await DataStorage().save_camera_status(3)
         return
 
-    while (time.perf_counter() - starting_time < TimelineEnum.SODS_OFF.adapted_value):
+    while (time.perf_counter() - time_when_started_recording < record_for):
         await DataStorage().save_camera_status(2)
-        logging.debug("Camera is RECORDING")
+        logging.info("Camera is RECORDING")
+
+        logging.info("LEDS are ON")
+        await DataStorage().save_led_status(1)
+
         await asyncio.sleep(0.3)
 
+    await DataStorage().save_camera_status(0)
     logging.info("Camera has STOPPED RECORDING")
     logging.info("Finished camera cycle")
