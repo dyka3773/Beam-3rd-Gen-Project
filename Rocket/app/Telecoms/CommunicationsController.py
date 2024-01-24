@@ -15,6 +15,9 @@ import Telecoms.Signals.signal_utils as signal_utils
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s',
+    filename='rocket.log',
+    encoding='utf-8',
+    filemode='a'
 )
 
 # Define the serial port and baud rate

@@ -14,6 +14,9 @@ from Telecoms.Signals import signal_utils
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s',
+    filename='rocket.log',
+    encoding='utf-8',
+    filemode='a'
 )
 
 
