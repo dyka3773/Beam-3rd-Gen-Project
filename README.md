@@ -97,3 +97,4 @@ Please contact us if you want to use any of the information or ideas that are us
 - Alexis Pakas - [Alex-Pak](https://github.com/Alex-Pak)
 - Maria Afentouli - [afentoulimaria](https://github.com/afentoulimaria)
 - Ilias Myserlis - [Louismys](https://github.com/Louismys)
+- Maria Doli - [mariadoli](https://github.com/mariadoli)
